@@ -1,0 +1,128 @@
+---
+import Girih from '~/components/Girih.astro';
+import Icon from '~/components/Icon.astro';
+import Mascot from '~/components/Mascot.astro';
+import Base from '~/layouts/Base.astro';
+---
+
+<Base lang="en" title="Page not found" description="This page bounced off the edge of the bazimazi website." noindex>
+  <section class="lost">
+    <Girih size={140} />
+    <div class="container lost__inner">
+      <p class="lost__code latin" aria-hidden="true">
+        4<span class="lost__ball"><i></i></span>4
+      </p>
+      <h1>This page bounced off the edge.</h1>
+      <p class="lost__lead">It may have moved, or it never existed. Either way, there are plenty of games back on the table.</p>
+      <div class="btn-row lost__actions">
+        <a class="btn" href="/">Back home<Icon name="arrow" /></a>
+        <a class="btn btn--ghost" href="/games/">See the games</a>
+      </div>
+
+      <div class="lost__fa" lang="fa" dir="rtl">
+        <p class="lost__fa-title persian-display">این صفحه از لبه بیرون پرید.</p>
+        <p class="persian">شاید جابه‌جا شده، شاید هم هیچ‌وقت نبوده. <a href="/fa/">برگرد به صفحهٔ اول</a></p>
+      </div>
+    </div>
+    <div class="lost__mascot"><Mascot lang="en" /></div>
+  </section>
+</Base>
+
+<style>
+  .lost {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-items: center;
+    padding-block: calc(var(--header-h) + 40px) 80px;
+    background:
+      radial-gradient(900px 600px at 80% 20%, #232a78 0%, transparent 60%),
+      var(--night-900);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .lost__inner {
+    position: relative;
+    z-index: 1;
+  }
+  .lost__code {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.06em;
+    font-size: clamp(7rem, 22vw, 16rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    line-height: 0.85;
+    color: var(--saffron);
+  }
+  .lost__ball {
+    position: relative;
+    display: inline-block;
+    width: 0.62em;
+    height: 0.72em;
+  }
+  .lost__ball i {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0.62em;
+    height: 0.62em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #8ae6dc, var(--firouzeh) 55%, #0b7d72);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .lost__ball i {
+      animation: lost-bounce 0.9s cubic-bezier(0.5, 0, 0.5, 1) infinite alternate;
+      transform-origin: 50% 100%;
+    }
+  }
+  @keyframes lost-bounce {
+    0% {
+      transform: translateY(-0.5em) scale(0.95, 1.05);
+    }
+    85% {
+      transform: translateY(0) scale(1, 1);
+    }
+    100% {
+      transform: translateY(0) scale(1.15, 0.85);
+    }
+  }
+  .lost h1 {
+    margin-top: 32px;
+    font-size: clamp(2.4rem, 5.5vw, 4.5rem);
+    max-width: 16ch;
+  }
+  .lost__lead {
+    margin-block: 18px 30px;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    max-width: 50ch;
+  }
+  .lost__fa {
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+    max-width: 640px;
+  }
+  .lost__fa-title {
+    font-size: 2rem;
+    line-height: 1.4;
+  }
+  .lost__fa a {
+    color: var(--saffron);
+  }
+  .lost__mascot {
+    position: absolute;
+    width: clamp(160px, 22vw, 300px);
+    inset-inline-end: 6%;
+    bottom: 8%;
+  }
+  @media (max-width: 760px) {
+    .lost__mascot {
+      position: relative;
+      inset: auto;
+      margin: 40px auto 0;
+      width: 160px;
+    }
+  }
+</style>

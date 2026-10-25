@@ -1,0 +1,353 @@
+---
+import Icon from './Icon.astro';
+import { localize, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const copy = {
+  en: {
+    board: 'Dooz board',
+    cell: (r: number, c: number) => `Row ${r}, column ${c}`,
+    empty: 'empty',
+    you: 'You',
+    draws: 'Draws',
+    bot: 'Bot',
+    again: 'New round',
+    full: 'Get the full game',
+    status: {
+      yours: 'Your move. You are ×.',
+      thinking: 'The bot is thinking…',
+      win: 'You won?! Please open an issue. That should be impossible.',
+      lose: 'The bot wins this one. Try again?',
+      draw: 'A draw. Against this bot, that counts as a win.',
+    },
+  },
+  fa: {
+    board: 'صفحهٔ دوز',
+    cell: (r: number, c: number) => `ردیف ${r}، ستون ${c}`,
+    empty: 'خالی',
+    you: 'تو',
+    draws: 'مساوی',
+    bot: 'ربات',
+    again: 'یه دست دیگه',
+    full: 'نسخهٔ کامل بازی',
+    status: {
+      yours: 'نوبت توست. تو × هستی.',
+      thinking: 'ربات دارد فکر می‌کند…',
+      win: 'بردی؟! لطفاً یک issue باز کن؛ این نباید ممکن باشد.',
+      lose: 'این دست را ربات برد. دوباره؟',
+      draw: 'مساوی! در برابر این ربات، مساوی یعنی بُرد.',
+    },
+  },
+}[lang];
+const digits = (n: number) => (lang === 'fa' ? '۰۱۲۳۴۵۶۷۸۹'[n] : String(n));
+---
+
+<div class="dooz" data-dooz data-status={JSON.stringify(copy.status)} data-empty={copy.empty}>
+  <div class="dooz__score" aria-label={`${copy.you} / ${copy.draws} / ${copy.bot}`}>
+    <div class="dooz__tally dooz__tally--x"><span>{copy.you}</span><b data-score="x">{digits(0)}</b></div>
+    <div class="dooz__tally"><span>{copy.draws}</span><b data-score="draw">{digits(0)}</b></div>
+    <div class="dooz__tally dooz__tally--o"><span>{copy.bot}</span><b data-score="o">{digits(0)}</b></div>
+  </div>
+
+  <div class="dooz__board" role="grid" aria-label={copy.board}>
+    {
+      [0, 1, 2].map((r) => (
+        <div class="dooz__row" role="row">
+          {[0, 1, 2].map((c) => (
+            <button class="dooz__cell" type="button" role="gridcell" data-cell={r * 3 + c} data-label={copy.cell(r + 1, c + 1)} aria-label={`${copy.cell(r + 1, c + 1)}, ${copy.empty}`} />
+          ))}
+        </div>
+      ))
+    }
+    <svg class="dooz__strike" viewBox="0 0 300 300" aria-hidden="true"><line data-strike x1="0" y1="0" x2="0" y2="0"></line></svg>
+  </div>
+
+  <p class="dooz__status" aria-live="polite" data-status-line>{copy.status.yours}</p>
+
+  <div class="dooz__actions">
+    <button class="btn btn--turquoise" type="button" data-reset>{copy.again}</button>
+    <a class="link-arrow" href={localize('/games/dooz/', lang)}>{copy.full}<Icon name="arrow" /></a>
+  </div>
+</div>
+
+<style>
+  .dooz {
+    display: grid;
+    gap: 22px;
+    justify-items: center;
+    width: 100%;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+  .dooz__score {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 0.05);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+  .dooz__tally {
+    display: grid;
+    justify-items: center;
+    padding: 12px 8px;
+    font-size: 0.85rem;
+  }
+  .dooz__tally span {
+    opacity: 0.6;
+  }
+  .dooz__tally b {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    line-height: 1.1;
+  }
+  .dooz__tally--x b {
+    color: var(--orange);
+  }
+  .dooz__tally--o b {
+    color: var(--firouzeh);
+  }
+  .dooz__board {
+    position: relative;
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    aspect-ratio: 1;
+    direction: ltr;
+  }
+  .dooz__row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .dooz__cell {
+    position: relative;
+    border-radius: 20px;
+    background: rgb(255 255 255 / 0.06);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    transition:
+      background-color 0.2s,
+      transform 0.25s var(--ease-spring);
+  }
+  .dooz__cell:not(:disabled):hover {
+    background: rgb(255 255 255 / 0.12);
+    transform: scale(1.03);
+  }
+  .dooz__cell:disabled {
+    cursor: default;
+  }
+  .dooz__cell :global(svg) {
+    position: absolute;
+    inset: 18%;
+    width: 64%;
+    height: 64%;
+    overflow: visible;
+  }
+  .dooz__cell :global(.mark) {
+    fill: none;
+    stroke-width: 14;
+    stroke-linecap: round;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .dooz__cell :global(.mark) {
+      animation: dooz-draw 0.45s var(--ease-out) both;
+    }
+    .dooz__cell :global(.mark + .mark) {
+      animation-delay: 0.12s;
+    }
+  }
+  @keyframes dooz-draw {
+    from {
+      stroke-dashoffset: 200;
+    }
+  }
+  .dooz__cell :global(.mark--x) {
+    stroke: var(--orange);
+  }
+  .dooz__cell :global(.mark--o) {
+    stroke: var(--firouzeh);
+  }
+  .dooz__cell.is-win {
+    background: rgb(255 184 28 / 0.18);
+  }
+  .dooz__strike {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .dooz__strike line {
+    stroke: var(--saffron);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 500;
+    stroke-dashoffset: 500;
+    opacity: 0;
+    transition: stroke-dashoffset 0.6s var(--ease-out);
+  }
+  .dooz__strike line.is-on {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  .dooz__status {
+    min-height: 3.2em;
+    text-align: center;
+    font-weight: 600;
+  }
+  .dooz__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px 24px;
+  }
+</style>
+
+<script>
+  const LINES = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  type Mark = 'x' | 'o' | null;
+
+  const winner = (b: Mark[]) => {
+    for (const line of LINES) {
+      const [a, c, d] = line;
+      if (b[a] && b[a] === b[c] && b[a] === b[d]) return { mark: b[a], line };
+    }
+    return b.every(Boolean) ? { mark: 'draw' as const, line: null } : null;
+  };
+
+  /** Full minimax: prefers quick wins and slow losses. Score is from O's (the bot's) view. */
+  const minimax = (b: Mark[], turn: 'x' | 'o', depth: number): number => {
+    const w = winner(b);
+    if (w) return w.mark === 'o' ? 10 - depth : w.mark === 'x' ? depth - 10 : 0;
+    let best = turn === 'o' ? -Infinity : Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (b[i]) continue;
+      b[i] = turn;
+      const score = minimax(b, turn === 'o' ? 'x' : 'o', depth + 1);
+      b[i] = null;
+      best = turn === 'o' ? Math.max(best, score) : Math.min(best, score);
+    }
+    return best;
+  };
+
+  const bestMove = (b: Mark[]) => {
+    let best = -Infinity;
+    let moves: number[] = [];
+    for (let i = 0; i < 9; i++) {
+      if (b[i]) continue;
+      b[i] = 'o';
+      const score = minimax(b, 'x', 1);
+      b[i] = null;
+      if (score > best) {
+        best = score;
+        moves = [i];
+      } else if (score === best) moves.push(i);
+    }
+    // Among equally perfect moves, pick one at random so games feel less scripted.
+    return moves[Math.floor(Math.random() * moves.length)];
+  };
+
+  const SVG = {
+    x: '<svg viewBox="0 0 100 100"><path class="mark mark--x" d="M12 12 88 88"/><path class="mark mark--x" d="M88 12 12 88"/></svg>',
+    o: '<svg viewBox="0 0 100 100"><circle class="mark mark--o" cx="50" cy="50" r="38" transform="rotate(-90 50 50)"/></svg>',
+  };
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-dooz]')) {
+    const cells = [...root.querySelectorAll<HTMLButtonElement>('[data-cell]')];
+    const statusLine = root.querySelector<HTMLElement>('[data-status-line]')!;
+    const strike = root.querySelector<SVGLineElement>('[data-strike]')!;
+    const status = JSON.parse(root.dataset.status!) as Record<'yours' | 'thinking' | 'win' | 'lose' | 'draw', string>;
+    const fa = document.documentElement.lang === 'fa';
+    const fmt = (n: number) => (fa ? n.toLocaleString('fa-IR') : String(n));
+    const score = { x: 0, o: 0, draw: 0 };
+    let board: Mark[] = Array(9).fill(null);
+    let botStarts = false;
+    let busy = false;
+
+    const render = () => {
+      cells.forEach((cell, i) => {
+        const mark = board[i];
+        if (mark && !cell.firstChild) cell.innerHTML = SVG[mark];
+        if (!mark) cell.innerHTML = '';
+        cell.disabled = !!mark || busy || !!winner(board);
+        cell.setAttribute('aria-label', `${cell.dataset.label}, ${mark ? (mark === 'x' ? '×' : '○') : root.dataset.empty}`);
+      });
+    };
+
+    const finish = () => {
+      const w = winner(board);
+      if (!w) return false;
+      score[w.mark]++;
+      root.querySelector(`[data-score="${w.mark}"]`)!.textContent = fmt(score[w.mark]);
+      statusLine.textContent = w.mark === 'x' ? status.win : w.mark === 'o' ? status.lose : status.draw;
+      if (w.line) {
+        const pos = (i: number) => [46.7 + (i % 3) * 103.3, 46.7 + Math.floor(i / 3) * 103.3];
+        const [x1, y1] = pos(w.line[0]);
+        const [x2, y2] = pos(w.line[2]);
+        const dx = (x2 - x1) * 0.18;
+        const dy = (y2 - y1) * 0.18;
+        strike.setAttribute('x1', String(x1 - dx));
+        strike.setAttribute('y1', String(y1 - dy));
+        strike.setAttribute('x2', String(x2 + dx));
+        strike.setAttribute('y2', String(y2 + dy));
+        requestAnimationFrame(() => strike.classList.add('is-on'));
+        w.line.forEach((i) => cells[i].classList.add('is-win'));
+      }
+      render();
+      return true;
+    };
+
+    const botTurn = () => {
+      busy = true;
+      statusLine.textContent = status.thinking;
+      render();
+      setTimeout(() => {
+        board[bestMove(board)] = 'o';
+        busy = false;
+        if (!finish()) {
+          statusLine.textContent = status.yours;
+          render();
+        }
+      }, 520);
+    };
+
+    const reset = () => {
+      board = Array(9).fill(null);
+      cells.forEach((c) => c.classList.remove('is-win'));
+      strike.classList.remove('is-on');
+      busy = false;
+      statusLine.textContent = status.yours;
+      render();
+      if (botStarts) botTurn();
+      botStarts = !botStarts;
+    };
+
+    cells.forEach((cell, i) =>
+      cell.addEventListener('click', () => {
+        if (board[i] || busy || winner(board)) return;
+        board[i] = 'x';
+        render();
+        if (!finish()) botTurn();
+      }),
+    );
+    root.querySelector('[data-reset]')!.addEventListener('click', reset);
+    botStarts = true;
+    render();
+  }
+</script>

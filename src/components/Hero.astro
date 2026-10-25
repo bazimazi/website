@@ -1,0 +1,637 @@
+---
+import Girih from './Girih.astro';
+import Icon from './Icon.astro';
+import Mascot from './Mascot.astro';
+import { SITE } from '~/config';
+import { getOrgStats } from '~/data/github';
+import { localize, num, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const stats = await getOrgStats();
+
+const copy = {
+  en: {
+    eyebrow: `An open game studio · since ${SITE.founded}`,
+    lines: [
+      ['Simple', 'games.'],
+      ['Persian', 'soul.'],
+    ],
+    lead: 'We turn the games, stories and patterns of Iran into games that are easy to pick up and hard to put down. Every line of code is on GitHub.',
+    primary: 'Explore the games',
+    secondary: 'Star us on GitHub',
+    hint: 'Tap anywhere. Things bounce here.',
+    stats: [
+      [num(stats.repos, lang), 'open repositories'],
+      ['MIT', 'on every game'],
+      [num(stats.languages, lang), 'languages, one studio'],
+    ],
+  },
+  fa: {
+    eyebrow: `استودیوی بازی‌سازی باز · از ${num(SITE.founded, lang).replace('٬', '')}`,
+    lines: [
+      ['بازی‌های', 'ساده،'],
+      ['با روح', 'ایرانی.'],
+    ],
+    lead: 'بازی‌ها، قصه‌ها و نقش‌های ایران را به بازی‌هایی تبدیل می‌کنیم که شروعشان آسان است و کنار گذاشتنشان سخت. تک‌تک خط‌های کدشان در گیت‌هاب است.',
+    primary: 'دیدن بازی‌ها',
+    secondary: 'ستاره در گیت‌هاب',
+    hint: 'هر جا را لمس کن؛ اینجا همه‌چیز بالا و پایین می‌پرد.',
+    stats: [
+      [num(stats.repos, lang), 'مخزن متن‌باز'],
+      ['MIT', 'برای همهٔ بازی‌ها'],
+      [num(stats.languages, lang), 'زبان برنامه‌نویسی، یک استودیو'],
+    ],
+  },
+}[lang];
+---
+
+<section class="hero" data-playground>
+  <Girih class="girih-bg hero__girih" size={140} />
+  <div class="hero__glow" aria-hidden="true"></div>
+  <p class="hero__watermark persian-display" aria-hidden="true">بازی</p>
+
+  <div class="hero__grid container">
+    <div class="hero__copy">
+      <p class="eyebrow hero__eyebrow">{copy.eyebrow}</p>
+      <h1 class="hero__title">
+        {
+          copy.lines.map((words, i) => (
+            <span class:list={['hero__line', `hero__line--${i + 1}`]}>
+              {words.map((word, j) => (
+                <>
+                  <span class="hero__word" data-collide style={`--i:${i * 2 + j}`}>
+                    {word}
+                  </span>{' '}
+                </>
+              ))}
+            </span>
+          ))
+        }
+      </h1>
+      <p class="hero__lead">{copy.lead}</p>
+      <div class="btn-row">
+        <a class="btn" href={localize('/games/', lang)}>
+          {copy.primary}
+          <Icon name="arrow" class="flip" />
+        </a>
+        <a class="btn btn--ghost" href={SITE.github}>
+          <Icon name="github" />
+          {copy.secondary}
+        </a>
+      </div>
+      <dl class="hero__stats">
+        {
+          copy.stats.map(([value, label]) => (
+            <div>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+    <div class="hero__mascot" data-collide-round>
+      <Mascot lang={lang} />
+    </div>
+  </div>
+
+  <button class="hero__hint" type="button" data-drop>
+    <span class="hero__hint-ball" aria-hidden="true"></span>
+    {copy.hint}
+  </button>
+  <canvas class="hero__canvas" aria-hidden="true"></canvas>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: max(720px, 100svh);
+    display: flex;
+    align-items: center;
+    padding-block: calc(var(--header-h) + 48px) 120px;
+    background:
+      radial-gradient(1200px 700px at 85% 20%, #232a78 0%, transparent 60%),
+      radial-gradient(900px 600px at 0% 100%, #0f4a5a 0%, transparent 60%),
+      var(--night-900);
+    overflow: hidden;
+    isolation: isolate;
+    cursor: crosshair;
+  }
+  .hero__girih {
+    opacity: 0.06;
+    mask-image: radial-gradient(ellipse at 70% 40%, #000 0%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at 70% 40%, #000 0%, transparent 75%);
+  }
+  .hero__glow {
+    position: absolute;
+    width: 560px;
+    height: 560px;
+    right: 6%;
+    top: 22%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 138 31 / 0.35), transparent 65%);
+    filter: blur(20px);
+    z-index: -1;
+  }
+  [dir='rtl'] .hero__glow {
+    right: auto;
+    left: 6%;
+  }
+  .hero__watermark {
+    position: absolute;
+    bottom: -0.32em;
+    right: -0.04em;
+    font-size: clamp(14rem, 34vw, 32rem);
+    line-height: 1;
+    color: var(--paper);
+    opacity: 0.035;
+    z-index: -1;
+    pointer-events: none;
+    user-select: none;
+  }
+  [dir='rtl'] .hero__watermark {
+    right: auto;
+    left: -0.04em;
+  }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    align-items: center;
+    gap: 40px;
+  }
+  .hero__copy {
+    position: relative;
+    z-index: 1;
+    cursor: auto;
+  }
+  .hero__title {
+    margin-block: 22px 26px;
+    font-size: clamp(3rem, 6.6vw, 6.6rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+  }
+  :lang(fa) .hero__title {
+    font-size: clamp(2.9rem, 6.2vw, 6.2rem);
+    font-weight: 400;
+    line-height: 1.22;
+    letter-spacing: 0;
+  }
+  .hero__line {
+    display: block;
+  }
+  .hero__word {
+    display: inline-block;
+  }
+  .hero__line--2 .hero__word:first-child {
+    color: var(--firouzeh);
+  }
+  .hero__line--2 .hero__word:last-child {
+    color: var(--saffron);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__word {
+      animation: word-in 1s var(--ease-spring) both;
+      animation-delay: calc(var(--i) * 90ms + 120ms);
+    }
+    .hero__eyebrow,
+    .hero__lead,
+    .hero__copy .btn-row,
+    .hero__stats {
+      animation: fade-up 0.9s var(--ease-out) both;
+      animation-delay: 0.55s;
+    }
+    .hero__copy .btn-row {
+      animation-delay: 0.65s;
+    }
+    .hero__stats {
+      animation-delay: 0.75s;
+    }
+    .hero__mascot {
+      animation: mascot-in 1.1s var(--ease-spring) 0.3s both;
+    }
+  }
+  @keyframes word-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5em) rotate(4deg);
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+  @keyframes mascot-in {
+    from {
+      opacity: 0;
+      transform: translateY(80px) scale(0.8);
+    }
+  }
+  .hero__lead {
+    max-width: 52ch;
+    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+    opacity: 0.82;
+    margin-bottom: 32px;
+  }
+  .hero__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 40px;
+    margin-top: 48px;
+    padding-top: 26px;
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+  }
+  .hero__stats div {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .hero__stats dd {
+    font-family: var(--font-display);
+    font-size: 2.1rem;
+    font-weight: 750;
+    line-height: 1.1;
+    margin: 0;
+  }
+  .hero__stats dt {
+    font-size: 0.9rem;
+    opacity: 0.6;
+  }
+  .hero__mascot {
+    position: relative;
+    width: min(100%, 440px);
+    justify-self: center;
+    cursor: auto;
+  }
+  .hero__hint {
+    position: absolute;
+    left: 50%;
+    bottom: 76px;
+    translate: -50% 0;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.07);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+    font-size: 0.9rem;
+    color: rgb(247 240 227 / 0.8);
+    white-space: nowrap;
+    transition:
+      opacity 0.6s,
+      background-color 0.2s;
+  }
+  .hero__hint:hover {
+    background: rgb(255 255 255 / 0.12);
+  }
+  .hero__hint.is-done {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hero__hint-ball {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--saffron);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__hint-ball {
+      animation: hint-bounce 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite alternate;
+    }
+  }
+  @keyframes hint-bounce {
+    from {
+      transform: translateY(-6px);
+    }
+    to {
+      transform: translateY(4px) scale(1.15, 0.85);
+    }
+  }
+  .hero__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      align-items: flex-start;
+      padding-bottom: 150px;
+    }
+    .hero__grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .hero__mascot {
+      grid-row: 1;
+      width: 170px;
+      justify-self: start;
+    }
+    .hero__title {
+      margin-top: 14px;
+    }
+    .hero__stats {
+      margin-top: 36px;
+      gap: 16px 28px;
+    }
+    .hero__stats dd {
+      font-size: 1.6rem;
+    }
+    .hero__hint {
+      font-size: 0.8rem;
+      white-space: normal;
+      text-align: center;
+      width: max-content;
+      max-width: calc(100% - 32px);
+    }
+  }
+</style>
+
+<script>
+  type Ball = { x: number; y: number; vx: number; vy: number; r: number; color: string; born: number; squash: number; nx: number; ny: number; dying: number };
+  type Box = { x: number; y: number; w: number; h: number };
+  type Round = { x: number; y: number; r: number; el: HTMLElement };
+
+  const hero = document.querySelector<HTMLElement>('[data-playground]');
+  const canvas = hero?.querySelector('canvas');
+  const ctx = canvas?.getContext('2d');
+
+  if (hero && canvas && ctx) {
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const COLORS = ['#20c4b4', '#ffb81c', '#e8434a', '#ff8a1f', '#f6a7b6', '#8ae6dc', '#f7f0e3'];
+    const GRAVITY = 2000;
+    const BOUNCE = 0.72;
+    const LIFE = 16000;
+    const MAX = 40;
+    const w = window as Window & { bazimaziLook?: { x: number; y: number; at: number } };
+
+    let W = 0;
+    let H = 0;
+    let boxes: Box[] = [];
+    let rounds: Round[] = [];
+    const balls: Ball[] = [];
+    let running = false;
+    let visible = true;
+    let last = 0;
+    let lastSquish = 0;
+
+    const measure = () => {
+      const hr = hero.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = hr.width;
+      H = hr.height;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      canvas.style.width = `${W}px`;
+      canvas.style.height = `${H}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Word boxes, trimmed to the glyphs rather than the full line box.
+      boxes = [...hero.querySelectorAll<HTMLElement>('[data-collide]')].map((el) => {
+        const r = el.getBoundingClientRect();
+        return { x: r.left - hr.left + r.height * 0.04, y: r.top - hr.top + r.height * 0.2, w: r.width - r.height * 0.08, h: r.height * 0.66 };
+      });
+      rounds = [...hero.querySelectorAll<HTMLElement>('[data-collide-round]')].map((el) => {
+        const r = el.getBoundingClientRect();
+        return { x: r.left - hr.left + r.width / 2, y: r.top - hr.top + r.height * 0.56, r: r.width * 0.36, el };
+      });
+    };
+
+    const spawn = (x: number, y: number, vx = (Math.random() - 0.5) * 300, vy = -150) => {
+      const r = 9 + Math.random() * 13;
+      balls.push({ x, y, vx, vy, r, color: COLORS[Math.floor(Math.random() * COLORS.length)], born: performance.now(), squash: 0, nx: 0, ny: -1, dying: 0 });
+      const alive = balls.filter((b) => !b.dying);
+      if (alive.length > MAX) alive[0].dying = performance.now();
+      start();
+    };
+
+    const impact = (b: Ball, speed: number, nx: number, ny: number) => {
+      if (speed < 120) return;
+      b.squash = Math.min(0.32, speed / 3200);
+      b.nx = nx;
+      b.ny = ny;
+    };
+
+    const collideBox = (b: Ball, box: Box) => {
+      const cx = Math.max(box.x, Math.min(b.x, box.x + box.w));
+      const cy = Math.max(box.y, Math.min(b.y, box.y + box.h));
+      let dx = b.x - cx;
+      let dy = b.y - cy;
+      let d = Math.hypot(dx, dy);
+      if (d >= b.r) return;
+      if (d === 0) {
+        // Centre inside the box: push out through the top.
+        dx = 0;
+        dy = -1;
+        d = 1;
+        b.y = box.y - b.r;
+      } else {
+        const push = b.r - d;
+        b.x += (dx / d) * push;
+        b.y += (dy / d) * push;
+      }
+      resolve(b, dx / d, dy / d, 0.62);
+    };
+
+    const collideRound = (b: Ball, c: Round) => {
+      const dx = b.x - c.x;
+      const dy = b.y - c.y;
+      const d = Math.hypot(dx, dy);
+      if (d >= b.r + c.r || d === 0) return;
+      const nx = dx / d;
+      const ny = dy / d;
+      b.x = c.x + nx * (b.r + c.r);
+      b.y = c.y + ny * (b.r + c.r);
+      const speed = resolve(b, nx, ny, 0.85);
+      const now = performance.now();
+      if (speed > 500 && now - lastSquish > 700) {
+        lastSquish = now;
+        const mascot = c.el.querySelector<HTMLElement>('[data-mascot]');
+        mascot?.classList.remove('is-squished');
+        void mascot?.offsetWidth;
+        mascot?.classList.add('is-squished');
+      }
+    };
+
+    /** Reflects the ball's velocity off a surface with normal (nx, ny); returns the impact speed. */
+    const resolve = (b: Ball, nx: number, ny: number, bounce: number) => {
+      const vn = b.vx * nx + b.vy * ny;
+      if (vn >= 0) return 0;
+      impact(b, -vn, nx, ny);
+      const k = -vn < 70 ? 1 : 1 + bounce;
+      b.vx -= k * vn * nx;
+      b.vy -= k * vn * ny;
+      b.vx *= 0.99;
+      return -vn;
+    };
+
+    const step = (dt: number) => {
+      for (const b of balls) {
+        b.vy += GRAVITY * dt;
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        if (b.x < b.r) {
+          b.x = b.r;
+          b.vx = Math.abs(b.vx) * BOUNCE;
+        } else if (b.x > W - b.r) {
+          b.x = W - b.r;
+          b.vx = -Math.abs(b.vx) * BOUNCE;
+        }
+        if (b.y > H - b.r) {
+          b.y = H - b.r;
+          if (b.vy > 0) {
+            impact(b, b.vy, 0, -1);
+            b.vy = b.vy < 90 ? 0 : -b.vy * BOUNCE;
+            b.vx *= 0.97;
+          }
+        }
+        for (const box of boxes) collideBox(b, box);
+        for (const c of rounds) collideRound(b, c);
+      }
+      // Ball against ball.
+      for (let i = 0; i < balls.length; i++) {
+        const a = balls[i];
+        for (let j = i + 1; j < balls.length; j++) {
+          const b = balls[j];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const min = a.r + b.r;
+          const d2 = dx * dx + dy * dy;
+          if (d2 >= min * min || d2 === 0) continue;
+          const d = Math.sqrt(d2);
+          const nx = dx / d;
+          const ny = dy / d;
+          const ma = a.r * a.r;
+          const mb = b.r * b.r;
+          const overlap = min - d;
+          a.x -= nx * overlap * (mb / (ma + mb));
+          a.y -= ny * overlap * (mb / (ma + mb));
+          b.x += nx * overlap * (ma / (ma + mb));
+          b.y += ny * overlap * (ma / (ma + mb));
+          const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+          if (rv >= 0) continue;
+          const jImpulse = (-(1 + 0.8) * rv) / (1 / ma + 1 / mb);
+          a.vx -= (jImpulse / ma) * nx;
+          a.vy -= (jImpulse / ma) * ny;
+          b.vx += (jImpulse / mb) * nx;
+          b.vy += (jImpulse / mb) * ny;
+        }
+      }
+    };
+
+    const draw = (now: number) => {
+      ctx.clearRect(0, 0, W, H);
+      for (const b of balls) {
+        const fade = b.dying ? Math.max(0, 1 - (now - b.dying) / 400) : 1;
+        const r = b.r * (b.dying ? 0.4 + 0.6 * fade : 1);
+        ctx.save();
+        ctx.globalAlpha = fade;
+        ctx.translate(b.x, b.y);
+        ctx.rotate(Math.atan2(b.ny, b.nx));
+        ctx.scale(1 - b.squash, 1 + b.squash * 0.8);
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = b.color;
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.globalAlpha = fade * 0.45;
+        ctx.beginPath();
+        ctx.arc(b.x - r * 0.32, b.y - r * 0.34, r * 0.32, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.restore();
+        b.squash *= 0.82;
+      }
+    };
+
+    const frame = (now: number) => {
+      if (!running) return;
+      const dt = Math.min(0.033, (now - last) / 1000);
+      last = now;
+      const sub = 3;
+      for (let i = 0; i < sub; i++) step(dt / sub);
+      for (const b of balls) if (!b.dying && now - b.born > LIFE) b.dying = now;
+      for (let i = balls.length - 1; i >= 0; i--) if (balls[i].dying && now - balls[i].dying > 400) balls.splice(i, 1);
+      draw(now);
+      // Let the mascot watch the newest ball.
+      const watched = balls.at(-1);
+      if (watched) {
+        const hr = hero.getBoundingClientRect();
+        w.bazimaziLook = { x: hr.left + watched.x, y: hr.top + watched.y, at: performance.now() };
+      }
+      if (!balls.length || !visible) {
+        running = false;
+        ctx.clearRect(0, 0, W, H);
+        return;
+      }
+      requestAnimationFrame(frame);
+    };
+
+    const start = () => {
+      if (running || !visible) return;
+      running = true;
+      last = performance.now();
+      requestAnimationFrame(frame);
+    };
+
+    const local = (e: MouseEvent) => {
+      const hr = hero.getBoundingClientRect();
+      return { x: e.clientX - hr.left, y: e.clientY - hr.top };
+    };
+
+    const hint = hero.querySelector<HTMLElement>('[data-drop]')!;
+    const retireHint = () => setTimeout(() => hint.classList.add('is-done'), 2500);
+
+    hero.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('a, button, input, [data-mascot]')) return;
+      const { x, y } = local(e);
+      spawn(x, y);
+      retireHint();
+    });
+    // Drag with a mouse to pour balls.
+    let pouring = 0;
+    hero.addEventListener('pointerdown', (e) => {
+      // Leave the copy alone so text can still be selected.
+      if (e.pointerType !== 'mouse' || (e.target as HTMLElement).closest('a, button, input, .hero__copy')) return;
+      pouring = performance.now();
+    });
+    hero.addEventListener('pointermove', (e) => {
+      if (!pouring || !(e.buttons & 1) || performance.now() - pouring < 90) return;
+      pouring = performance.now();
+      const { x, y } = local(e);
+      spawn(x, y, e.movementX * 30, e.movementY * 30);
+    });
+    window.addEventListener('pointerup', () => (pouring = 0));
+
+    hint.addEventListener('click', () => {
+      const box = boxes[Math.floor(Math.random() * boxes.length)];
+      spawn(box ? box.x + Math.random() * box.w : W / 2, 40, (Math.random() - 0.5) * 200, 0);
+    });
+
+    new ResizeObserver(measure).observe(hero);
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible && balls.length) start();
+    }).observe(hero);
+
+    document.fonts.ready.then(() => {
+      measure();
+      if (calm) return;
+      // Measure again once the headline's entrance animation has settled.
+      setTimeout(measure, 1450);
+      // A friendly opening: a few balls land on the headline.
+      boxes.forEach((box, i) => {
+        setTimeout(() => spawn(box.x + box.w * (0.25 + Math.random() * 0.5), -30 - Math.random() * 60, (Math.random() - 0.5) * 120, 0), 1500 + i * 260);
+      });
+    });
+  }
+</script>

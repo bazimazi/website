@@ -1,0 +1,26 @@
+---
+/**
+ * A tiling eight-point star pattern (the khatam motif of Persian tilework),
+ * drawn as a repeating SVG pattern in currentColor.
+ */
+interface Props {
+  class?: string;
+  size?: number;
+}
+const { class: className = 'girih-bg', size = 120 } = Astro.props;
+const id = `girih-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<svg class={className} aria-hidden="true" width="100%" height="100%">
+  <defs>
+    <pattern id={id} width={size} height={size} patternUnits="userSpaceOnUse" viewBox="0 0 120 120">
+      <g fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M60 22 98 60 60 98 22 60Z"></path>
+        <path d="M33 33h54v54H33Z"></path>
+        <path d="M60 36 77 60 60 84 43 60Z"></path>
+        <path d="M60 22V0M60 98v22M22 60H0M98 60h22M33 33 0 0M87 33l33-33M33 87 0 120M87 87l33 33"></path>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill={`url(#${id})`}></rect>
+</svg>

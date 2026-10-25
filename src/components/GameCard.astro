@@ -1,0 +1,219 @@
+---
+import GameArt from './GameArt.astro';
+import Icon from './Icon.astro';
+import type { Game } from '~/data/games';
+import { isActive, getRepo } from '~/data/github';
+import { localize, t, type Lang } from '~/i18n';
+
+interface Props {
+  game: Game;
+  lang: Lang;
+  size?: 'default' | 'wide' | 'tall';
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { game, lang, size = 'default', headingLevel: H = 'h3' } = Astro.props;
+const ui = t(lang);
+const repo = await getRepo(game.repo);
+const active = isActive(repo);
+const subtitle = lang === 'en' ? game.native : game.name.en !== game.name.fa ? game.name.en : undefined;
+---
+
+<article
+  class:list={['game-card', `game-card--${size}`]}
+  style={`--card-bg:${game.theme.bg};--card-fg:${game.theme.fg};--card-accent:${game.theme.accent}`}
+  data-family={game.family}
+  data-tilt
+>
+  <div class="game-card__art">
+    <GameArt slug={game.slug} />
+  </div>
+  <div class="game-card__body">
+    <div class="game-card__meta">
+      <span class="pill">{ui.family[game.family]}</span>
+      {active && <span class="pill pill--live">{ui.active}</span>}
+    </div>
+    <H class="game-card__title">
+      <a href={localize(`/games/${game.slug}/`, lang)}>
+        {game.name[lang]}
+      </a>
+      {subtitle && <span class:list={['game-card__native', lang === 'en' ? 'persian' : 'latin']} lang={lang === 'en' ? 'fa' : 'en'}>{subtitle}</span>}
+    </H>
+    <p class="game-card__tagline">{game.tagline[lang]}</p>
+    <div class="game-card__foot">
+      <span class="game-card__players"><Icon name="users" size={16} />{game.players[lang]}</span>
+      <span class="game-card__go" aria-hidden="true"><Icon name="arrow" size={20} /></span>
+    </div>
+  </div>
+</article>
+
+<style>
+  .game-card {
+    --rx: 0deg;
+    --ry: 0deg;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-l);
+    background: var(--card-bg);
+    color: var(--card-fg);
+    overflow: hidden;
+    isolation: isolate;
+    transform: perspective(1200px) rotateX(var(--rx)) rotateY(var(--ry));
+    transition:
+      transform 0.5s var(--ease-out),
+      box-shadow 0.5s var(--ease-out);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.08) inset,
+      0 20px 40px -24px rgb(0 0 0 / 0.5);
+  }
+  .game-card:hover {
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.08) inset,
+      0 40px 70px -30px rgb(0 0 0 / 0.6);
+  }
+  .game-card:focus-within {
+    outline: 3px solid var(--saffron);
+    outline-offset: 4px;
+  }
+  .game-card__art {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+  .game-card__art :global(svg) {
+    transition: transform 0.8s var(--ease-out);
+  }
+  .game-card:hover .game-card__art :global(svg) {
+    transform: scale(1.04);
+  }
+  .game-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 22px 26px 24px;
+    flex: 1;
+  }
+  .game-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .game-card__title {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: clamp(1.6rem, 2.4vw, 2rem);
+    margin-top: 4px;
+  }
+  .game-card__title a {
+    text-decoration: none;
+  }
+  /* The whole card is the link target. */
+  .game-card__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .game-card__title a:focus-visible {
+    outline: none;
+  }
+  .game-card__native {
+    font-size: 0.6em;
+    font-weight: 600;
+    color: var(--card-accent);
+    letter-spacing: 0;
+  }
+  .game-card__tagline {
+    opacity: 0.8;
+    font-size: 1.02rem;
+  }
+  .game-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 10px;
+    font-size: 0.9rem;
+  }
+  .game-card__players {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.75;
+  }
+  .game-card__go {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--card-accent);
+    color: var(--card-bg);
+    transition: transform 0.4s var(--ease-spring);
+  }
+  [dir='rtl'] .game-card__go :global(svg) {
+    transform: scaleX(-1);
+  }
+  .game-card:hover .game-card__go {
+    transform: rotate(-45deg) scale(1.08);
+  }
+  [dir='rtl'] .game-card:hover .game-card__go {
+    transform: rotate(45deg) scale(1.08);
+  }
+
+  .game-card--wide {
+    flex-direction: row;
+  }
+  .game-card--wide .game-card__art {
+    flex: 1.35;
+    aspect-ratio: auto;
+    min-height: 360px;
+  }
+  .game-card--wide .game-card__body {
+    flex: 1;
+    justify-content: center;
+    padding: 40px;
+  }
+  .game-card--wide .game-card__title {
+    font-size: clamp(2rem, 3.6vw, 3.25rem);
+  }
+  .game-card--wide .game-card__tagline {
+    font-size: 1.2rem;
+  }
+  @media (max-width: 760px) {
+    .game-card--wide {
+      flex-direction: column;
+    }
+    .game-card--wide .game-card__art {
+      aspect-ratio: 16 / 10;
+      min-height: 0;
+    }
+    .game-card--wide .game-card__body {
+      padding: 22px 26px 24px;
+    }
+  }
+</style>
+
+<script>
+  // A gentle 3D tilt that follows the pointer.
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (fine && !calm) {
+    for (const card of document.querySelectorAll<HTMLElement>('[data-tilt]')) {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--ry', `${(x * 6).toFixed(2)}deg`);
+        card.style.setProperty('--rx', `${(-y * 6).toFixed(2)}deg`);
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.setProperty('--ry', '0deg');
+        card.style.setProperty('--rx', '0deg');
+      });
+    }
+  }
+</script>

@@ -1,0 +1,13 @@
+{
+  "name": "bazimazi",
+  "short_name": "bazimazi",
+  "description": "Simple games. Persian soul. An open game studio.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#10133a",
+  "theme_color": "#10133a",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}

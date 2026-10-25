@@ -1,0 +1,204 @@
+---
+import Icon from './Icon.astro';
+import LabGlyph from './LabGlyph.astro';
+import { SITE, repoUrl } from '~/config';
+import { getRepos } from '~/data/github';
+import { experiments, type Experiment } from '~/data/lab';
+import { formatDate, localize, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+  series?: Experiment['series'];
+  /** A closing card inviting people to start their own experiment. */
+  cta?: { title: string; text: string };
+  /** Include experiments that have since grown into games. */
+  graduated?: boolean;
+}
+
+const { lang, series, cta, graduated = true } = Astro.props;
+const repos = await getRepos();
+const list = experiments
+  .filter((e) => (!series || e.series === series) && (graduated || !e.graduated))
+  .map((e, i) => ({ ...e, data: repos.find((r) => r.name === e.repo), i }));
+const viewSource = lang === 'en' ? 'Source on GitHub' : 'کد در گیت‌هاب';
+const grownUp = lang === 'en' ? 'Now a game' : 'حالا یک بازی';
+---
+
+<ul class="lab-grid" role="list">
+  {
+    list.map((e) => (
+      <li class:list={['lab-card', { 'lab-card--grown': e.graduated }]} data-reveal style={`--reveal-delay:${(e.i % 4) * 70}`} data-lab-card>
+        <div class="lab-card__glyph">
+          <LabGlyph glyph={e.glyph} />
+        </div>
+        <h3 class="lab-card__name latin">
+          {e.graduated ? (
+            <a href={localize(`/games/${e.graduated}/`, lang)}>{e.name}</a>
+          ) : (
+            <a href={repoUrl(e.repo)}>
+              {e.name}
+              <span class="sr-only">({viewSource})</span>
+            </a>
+          )}
+        </h3>
+        <p class="lab-card__line">{e.line[lang]}</p>
+        <p class="lab-card__meta">
+          {e.data?.language && <span class="latin">{e.data.language}</span>}
+          {e.data && (
+            <time datetime={e.data.pushedAt} data-relative>
+              {formatDate(e.data.pushedAt, lang, { day: 'numeric', month: 'short' })}
+            </time>
+          )}
+          {e.graduated ? <span class="lab-card__badge">{grownUp}</span> : <Icon name="external" size={15} class="lab-card__ext" />}
+        </p>
+      </li>
+    ))
+  }
+  {
+    cta && (
+      <li class="lab-card lab-card--cta" data-reveal>
+        <span class="lab-card__plus" aria-hidden="true">+</span>
+        <h3 class="lab-card__name">
+          <a href={SITE.github}>{cta.title}</a>
+        </h3>
+        <p class="lab-card__line">{cta.text}</p>
+      </li>
+    )
+  }
+</ul>
+
+<style>
+  .lab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .lab-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px 18px;
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+    transition:
+      background-color 0.3s,
+      transform 0.4s var(--ease-spring),
+      box-shadow 0.3s;
+  }
+  .lab-card:hover {
+    background: rgb(255 255 255 / 0.08);
+    transform: translateY(-4px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  }
+  .lab-card:focus-within {
+    outline: 3px solid var(--saffron);
+    outline-offset: 3px;
+  }
+  .lab-card__glyph {
+    height: 92px;
+    margin-bottom: 8px;
+    color: var(--paper);
+  }
+  .lab-card__name {
+    font-family: 'Bricolage Grotesque Variable', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .lab-card__name a {
+    text-decoration: none;
+  }
+  .lab-card__name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .lab-card__name a:focus-visible {
+    outline: none;
+  }
+  .lab-card__line {
+    font-size: 0.95rem;
+    opacity: 0.72;
+    line-height: 1.5;
+  }
+  :lang(fa) .lab-card__line {
+    line-height: 1.8;
+  }
+  .lab-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 10px;
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+  :global(.lab-card__ext),
+  .lab-card__badge {
+    margin-inline-start: auto;
+  }
+  .lab-card--grown {
+    background: rgb(255 184 28 / 0.08);
+    box-shadow: inset 0 0 0 1px rgb(255 184 28 / 0.3);
+  }
+  .lab-card--grown .lab-card__meta {
+    opacity: 1;
+  }
+  .lab-card--grown .lab-card__meta > :not(.lab-card__badge) {
+    opacity: 0.5;
+  }
+  .lab-card__badge {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--saffron);
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .lab-card--cta {
+    justify-content: center;
+    align-items: flex-start;
+    background-color: transparent;
+    background-image: repeating-linear-gradient(135deg, rgb(255 255 255 / 0.03) 0 12px, transparent 12px 24px);
+    box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.14);
+  }
+  .lab-card--cta .lab-card__name {
+    font-family: var(--font-display);
+  }
+  :lang(fa) .lab-card--cta .lab-card__name {
+    font-weight: 400;
+  }
+  .lab-card__plus {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    background: var(--firouzeh);
+    color: var(--ink);
+    font-size: 2rem;
+    line-height: 1;
+  }
+</style>
+
+<script>
+  // Animate a lab glyph while its card is hovered, focused or, on touch screens, on screen.
+  const cards = document.querySelectorAll<HTMLElement>('[data-lab-card]');
+  const hover = matchMedia('(hover: hover)').matches;
+  for (const card of cards) {
+    card.addEventListener('pointerenter', () => card.classList.add('is-playing'));
+    card.addEventListener('pointerleave', () => card.classList.remove('is-playing'));
+    card.addEventListener('focusin', () => card.classList.add('is-playing'));
+    card.addEventListener('focusout', () => card.classList.remove('is-playing'));
+  }
+  if (!hover && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.target.classList.toggle('is-playing', e.isIntersecting)),
+      { threshold: 0.6 },
+    );
+    cards.forEach((c) => io.observe(c));
+  }
+</script>

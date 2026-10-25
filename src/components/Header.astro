@@ -1,0 +1,324 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { SITE } from '~/config';
+import { localize, t, unlocalize, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = t(lang);
+// The 404 page has no Persian twin, so its language switch points home.
+const current = unlocalize(Astro.url.pathname).replace(/^\/404.*/, '/');
+const other: Lang = lang === 'en' ? 'fa' : 'en';
+
+const links = [
+  { href: '/games/', label: ui.nav.games },
+  { href: '/#lab', label: ui.nav.lab },
+  { href: '/open-source/', label: ui.nav.open },
+  { href: '/studio/', label: ui.nav.studio },
+];
+const isCurrent = (href: string) => !href.includes('#') && current.startsWith(href);
+---
+
+<header class="header" data-header>
+  <div class="header__inner container">
+    <a class="header__brand" href={localize('/', lang)} aria-label="bazimazi home">
+      <Logo />
+    </a>
+
+    <nav id="site-nav" class="header__nav" aria-label={lang === 'en' ? 'Main' : 'اصلی'} data-nav>
+      <ul role="list">
+        {
+          links.map((link) => (
+            <li>
+              <a href={localize(link.href, lang)} aria-current={isCurrent(link.href) ? 'page' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="header__mobile-extra">
+        <a class="btn btn--turquoise" href={SITE.github}>
+          <Icon name="github" />
+          {ui.github}
+        </a>
+      </div>
+    </nav>
+
+    <div class="header__actions">
+      <a
+        class="header__lang"
+        href={localize(current, other)}
+        hreflang={other}
+        lang={other}
+        title={ui.switchLang}
+        data-lang-switch
+      >
+        <Icon name="globe" size={18} />
+        <span>{ui.otherLang}</span>
+      </a>
+      <a class="header__gh" href={SITE.github} aria-label={`bazimazi on ${ui.github}`}>
+        <Icon name="github" size={22} />
+      </a>
+      <button class="header__burger" type="button" aria-expanded="false" aria-controls="site-nav" data-burger>
+        <span class="sr-only">{ui.nav.menu}</span>
+        <span class="header__burger-lines" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 100;
+    height: var(--header-h);
+    color: var(--paper);
+    transition:
+      background-color 0.35s,
+      box-shadow 0.35s,
+      transform 0.45s var(--ease-out);
+  }
+  .header.is-scrolled {
+    background: color-mix(in srgb, var(--night-950) 82%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+  .header.is-hidden {
+    transform: translateY(-100%);
+  }
+  .header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 100%;
+  }
+  .header__brand {
+    text-decoration: none;
+    border-radius: 12px;
+  }
+  .header__nav ul {
+    display: flex;
+    gap: 6px;
+  }
+  .header__nav li a {
+    position: relative;
+    display: block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    opacity: 0.85;
+    transition:
+      opacity 0.2s,
+      background-color 0.2s;
+  }
+  .header__nav li a:hover {
+    opacity: 1;
+    background: rgb(255 255 255 / 0.08);
+  }
+  .header__nav li a[aria-current='page'] {
+    opacity: 1;
+  }
+  .header__nav li a[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background: var(--saffron);
+  }
+  .header__mobile-extra {
+    display: none;
+  }
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .header__lang,
+  .header__gh {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+  }
+  .header__lang {
+    box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.22);
+  }
+  .header__lang span:lang(fa) {
+    font-family: 'Vazirmatn Variable', sans-serif;
+  }
+  .header__lang span:lang(en) {
+    font-family: 'Bricolage Grotesque Variable', sans-serif;
+  }
+  .header__lang:hover,
+  .header__gh:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+  .header__gh {
+    width: 42px;
+    padding: 0;
+    justify-content: center;
+  }
+  .header__burger {
+    display: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    place-items: center;
+  }
+  .header__burger-lines {
+    position: relative;
+    width: 22px;
+    height: 12px;
+  }
+  .header__burger-lines i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform 0.35s var(--ease-out),
+      top 0.35s var(--ease-out);
+  }
+  .header__burger-lines i:first-child {
+    top: 0;
+  }
+  .header__burger-lines i:last-child {
+    top: 10px;
+  }
+  .header__burger[aria-expanded='true'] i:first-child {
+    top: 5px;
+    transform: rotate(45deg);
+  }
+  .header__burger[aria-expanded='true'] i:last-child {
+    top: 5px;
+    transform: rotate(-45deg);
+  }
+
+  @media (max-width: 860px) {
+    .header__burger {
+      display: grid;
+    }
+    .header__gh {
+      display: none;
+    }
+    .header__nav {
+      position: fixed;
+      inset: var(--header-h) 0 auto;
+      height: calc(100dvh - var(--header-h));
+      padding: 24px var(--gutter) 40px;
+      background: var(--night-950);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-12px);
+      transition:
+        opacity 0.3s,
+        transform 0.4s var(--ease-out),
+        visibility 0s 0.4s;
+    }
+    .header.is-open .header__nav {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition:
+        opacity 0.3s,
+        transform 0.4s var(--ease-out);
+    }
+    .header.is-open {
+      background: var(--night-950);
+    }
+    .header__nav ul {
+      flex-direction: column;
+      gap: 4px;
+    }
+    .header__nav li a {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 9vw, 2.75rem);
+      font-weight: 750;
+      letter-spacing: -0.03em;
+      display: inline-block;
+      padding: 8px 0;
+      opacity: 1;
+      background: none !important;
+    }
+    .header__nav li a:lang(fa),
+    :global(:lang(fa)) .header__nav li a {
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    .header__nav li a[aria-current='page']::after {
+      left: auto;
+      bottom: auto;
+      inset-inline-end: -16px;
+      top: 50%;
+      margin: -3px 0 0;
+    }
+    .header__mobile-extra {
+      display: flex;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const burger = header.querySelector<HTMLButtonElement>('[data-burger]')!;
+  const nav = header.querySelector<HTMLElement>('[data-nav]')!;
+
+  let lastY = window.scrollY;
+  const onScroll = () => {
+    const y = window.scrollY;
+    header.classList.toggle('is-scrolled', y > 24);
+    // Tuck the header away while reading downwards; bring it back on any upward scroll.
+    const open = header.classList.contains('is-open');
+    header.classList.toggle('is-hidden', !open && y > 480 && y > lastY + 4);
+    if (y < lastY - 4 || y < 480) header.classList.remove('is-hidden');
+    lastY = y;
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const setOpen = (open: boolean) => {
+    header.classList.toggle('is-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+  };
+  burger.addEventListener('click', () => setOpen(!header.classList.contains('is-open')));
+  nav.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && header.classList.contains('is-open')) {
+      setOpen(false);
+      burger.focus();
+    }
+  });
+
+  // Keep the reader's place when switching language: carry the hash along.
+  const switcher = header.querySelector<HTMLAnchorElement>('[data-lang-switch]');
+  switcher?.addEventListener('click', () => {
+    if (location.hash) switcher.href = switcher.href.split('#')[0] + location.hash;
+  });
+</script>

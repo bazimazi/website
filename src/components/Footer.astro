@@ -1,0 +1,178 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { SITE } from '~/config';
+import { localize, num, t, unlocalize, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = t(lang);
+const other: Lang = lang === 'en' ? 'fa' : 'en';
+// The 404 page has no Persian twin, so its language switch points home.
+const current = unlocalize(Astro.url.pathname).replace(/^\/404.*/, '/');
+const year = new Date().getFullYear();
+
+const explore = [
+  { href: '/games/', label: ui.nav.games },
+  { href: '/#lab', label: ui.nav.lab },
+  { href: '/open-source/', label: ui.nav.open },
+  { href: '/studio/', label: ui.nav.studio },
+];
+const elsewhere = [
+  { href: SITE.github, label: 'GitHub', icon: 'github' },
+  { href: SITE.x, label: 'X / Twitter', icon: 'x' },
+  { href: SITE.npm, label: 'npm', icon: 'npm' },
+  { href: `mailto:${SITE.email}`, label: ui.footer.email, icon: 'mail' },
+] as const;
+---
+
+<footer class="footer">
+  <div class="footer__inner container">
+    <div class="footer__brand">
+      <a href={localize('/', lang)} class="footer__logo" aria-label="bazimazi home"><Logo /></a>
+      <p>{ui.footer.tagline}</p>
+      <p class="footer__persian persian-display" lang="fa">بازی مازی</p>
+    </div>
+
+    <nav class="footer__col" aria-label={ui.footer.explore}>
+      <h2>{ui.footer.explore}</h2>
+      <ul role="list">
+        {explore.map((l) => <li><a href={localize(l.href, lang)}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <nav class="footer__col" aria-label={ui.footer.elsewhere}>
+      <h2>{ui.footer.elsewhere}</h2>
+      <ul role="list">
+        {
+          elsewhere.map((l) => (
+            <li>
+              <a href={l.href}>
+                <Icon name={l.icon} size={16} />
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="footer__col">
+      <h2>{ui.language}</h2>
+      <ul role="list">
+        <li><span aria-current="true">{ui.langName}</span></li>
+        <li><a href={localize(current, other)} hreflang={other} lang={other}>{ui.otherLang}</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer__base container">
+    <p>© {num(SITE.founded, lang).replace(/[,٬]/g, '')}–{num(year, lang).replace(/[,٬]/g, '')} bazimazi. {ui.footer.license}</p>
+    <p>{ui.footer.made} <a href={SITE.source}>{ui.footer.source}</a></p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    background: var(--night-950);
+    color: var(--paper);
+    padding-top: clamp(64px, 9vw, 110px);
+    overflow: hidden;
+  }
+  .footer__inner {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 64px;
+  }
+  .footer__brand p {
+    margin-top: 18px;
+    max-width: 30ch;
+    opacity: 0.7;
+  }
+  .footer__logo {
+    text-decoration: none;
+    display: inline-block;
+  }
+  .footer__persian {
+    display: inline-block;
+    font-size: 2.5rem;
+    color: var(--saffron);
+    opacity: 1 !important;
+    line-height: 1.2;
+  }
+  .footer__col h2 {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 18px;
+  }
+  :lang(fa) .footer__col h2 {
+    font-size: 0.95rem;
+    letter-spacing: 0;
+  }
+  .footer__col ul {
+    display: grid;
+    gap: 10px;
+  }
+  .footer__col a,
+  .footer__col span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    opacity: 0.85;
+    transition:
+      opacity 0.2s,
+      color 0.2s;
+  }
+  .footer__col a:hover {
+    opacity: 1;
+    color: var(--saffron);
+  }
+  .footer__col span[aria-current] {
+    opacity: 1;
+    font-weight: 700;
+  }
+  .footer__col span[aria-current]::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--firouzeh);
+  }
+  .footer__col a[lang='fa'] {
+    font-family: 'Vazirmatn Variable', sans-serif;
+  }
+  .footer__col a[lang='en'] {
+    font-family: 'Bricolage Grotesque Variable', sans-serif;
+  }
+  .footer__base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 32px;
+    padding-block: 28px 36px;
+    border-top: 1px solid rgb(255 255 255 / 0.08);
+    font-size: 0.875rem;
+    opacity: 0.6;
+  }
+  .footer__base a:hover {
+    color: var(--saffron);
+  }
+  @media (max-width: 860px) {
+    .footer__inner {
+      grid-template-columns: 1fr 1fr;
+    }
+    .footer__brand {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

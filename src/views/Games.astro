@@ -1,0 +1,167 @@
+---
+import GameCard from '~/components/GameCard.astro';
+import Girih from '~/components/Girih.astro';
+import JoinCta from '~/components/JoinCta.astro';
+import LabGrid from '~/components/LabGrid.astro';
+import PageHead from '~/components/PageHead.astro';
+import Base from '~/layouts/Base.astro';
+import { games, type Family } from '~/data/games';
+import { experiments } from '~/data/lab';
+import { num, t, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = t(lang);
+const families: Family[] = ['persian', 'arcade', 'roguelite'];
+const count = (f: Family) => games.filter((g) => g.family === f).length;
+
+const copy = {
+  en: {
+    title: 'Games',
+    description: 'Every bazimazi game, from Persian classics like Esm-Famil, Noqat and Dooz to arcade duels and roguelites. All open source.',
+    eyebrow: `${games.length} games · ${experiments.filter((e) => !e.graduated).length} experiments`,
+    heading: 'Pick a game. Any game.',
+    lead: 'Persian classics rebuilt with care, arcade games that fit in a coffee break, and roguelites for very long nights. Every one of them is open source.',
+    filter: 'Filter games',
+    all: 'All',
+    labTitle: 'Everything else in the lab',
+    labBody: 'Prototypes, experiments and questions we are still answering. Each links straight to its source.',
+    ctaTitle: 'Your experiment here',
+    ctaText: 'Pitch an idea in an issue, or skip the pitch and open a pull request.',
+  },
+  fa: {
+    title: 'بازی‌ها',
+    description: 'همهٔ بازی‌های بازی مازی، از کلاسیک‌های ایرانی مثل اسم فامیل، نقطه‌خط و دوز تا دوئل‌های آرکید و روگ‌لایت‌ها. همه متن‌باز.',
+    eyebrow: `${num(games.length, lang)} بازی · ${num(experiments.filter((e) => !e.graduated).length, lang)} آزمایش`,
+    heading: 'یک بازی انتخاب کن. هر کدام.',
+    lead: 'کلاسیک‌های ایرانی که با حوصله از نو ساخته شده‌اند، بازی‌های آرکیدی به اندازهٔ یک استراحت کوتاه، و روگ‌لایت‌هایی برای شب‌های خیلی طولانی. همه‌شان متن‌باز.',
+    filter: 'فیلتر بازی‌ها',
+    all: 'همه',
+    labTitle: 'بقیهٔ چیزهای آزمایشگاه',
+    labBody: 'نمونه‌های اولیه، آزمایش‌ها و سؤال‌هایی که هنوز جوابشان را پیدا نکرده‌ایم. هر کدام مستقیم به کدش می‌رسد.',
+    ctaTitle: 'آزمایش تو اینجا',
+    ctaText: 'ایده‌ات را در یک issue مطرح کن، یا اصلاً مستقیم یک pull request بفرست.',
+  },
+}[lang];
+---
+
+<Base lang={lang} title={copy.title} description={copy.description}>
+  <PageHead eyebrow={copy.eyebrow} title={copy.heading} lead={copy.lead} />
+
+  <section class="section section--paper catalog">
+    <Girih />
+    <div class="container">
+      <div class="catalog__filters" role="group" aria-label={copy.filter} data-filters>
+        <button type="button" class="chip" aria-pressed="true" data-filter="all">
+          {copy.all}
+          <span>{num(games.length, lang)}</span>
+        </button>
+        {
+          families.map((f) => (
+            <button type="button" class="chip" aria-pressed="false" data-filter={f}>
+              {ui.family[f]}
+              <span>{num(count(f), lang)}</span>
+            </button>
+          ))
+        }
+      </div>
+      <ul class="catalog__grid" role="list" data-catalog>
+        {
+          games.map((game, i) => (
+            <li data-family={game.family} data-reveal style={`--reveal-delay:${(i % 3) * 80}`}>
+              <GameCard game={game} lang={lang} headingLevel="h2" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--deep" id="lab">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <h2>{copy.labTitle}</h2>
+        <p>{copy.labBody}</p>
+      </div>
+      <LabGrid lang={lang} graduated={false} cta={{ title: copy.ctaTitle, text: copy.ctaText }} />
+    </div>
+  </section>
+
+  <JoinCta lang={lang} />
+</Base>
+
+<style>
+  .catalog {
+    padding-top: 56px;
+  }
+  .catalog__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-weight: 650;
+    background: var(--paper-2);
+    color: var(--ink);
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      transform 0.3s var(--ease-spring);
+  }
+  .chip span {
+    display: grid;
+    place-items: center;
+    min-width: 24px;
+    height: 24px;
+    padding-inline: 6px;
+    border-radius: 999px;
+    background: rgb(22 26 63 / 0.08);
+    font-size: 0.8rem;
+  }
+  .chip:hover {
+    transform: translateY(-2px);
+  }
+  .chip[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .chip[aria-pressed='true'] span {
+    background: var(--saffron);
+    color: var(--ink);
+  }
+  .catalog__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: 20px;
+  }
+  .catalog__grid li {
+    display: grid;
+  }
+  .catalog__grid li[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  const filters = document.querySelector<HTMLElement>('[data-filters]');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-catalog] > li')];
+  filters?.addEventListener('click', (e) => {
+    const button = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+    if (!button) return;
+    const value = button.dataset.filter!;
+    filters.querySelectorAll('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+    for (const item of items) {
+      item.hidden = value !== 'all' && item.dataset.family !== value;
+      item.classList.add('is-visible');
+    }
+  });
+</script>

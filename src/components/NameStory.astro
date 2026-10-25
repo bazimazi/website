@@ -1,0 +1,128 @@
+---
+import Girih from './Girih.astro';
+import type { Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const copy = {
+  en: {
+    eyebrow: 'The name',
+    title: 'Games, and everything that comes with them.',
+    body: [
+      'In Persian, bāzi (بازی) means play, or a game. Persian also has a lovely habit: say a word twice, swap the first sound of the echo for an m, and the meaning widens to “and all that.” Ketāb-metāb: books and such. Chāy-māy: tea and the rest.',
+      'So bazimazi means games, and everything that comes with them: the friends around the table, the argument over whether a city counts, the “one more round.” That is what we are really making.',
+    ],
+    bazi: 'play, a game',
+    mazi: '…and all that',
+  },
+  fa: {
+    eyebrow: 'اسم',
+    title: 'بازی، و هر چیزی که با آن می‌آید.',
+    body: [
+      'در فارسی عادت شیرینی داریم: کلمه‌ای را دوبار می‌گوییم، اول دومی را «م» می‌کنیم و معنا بزرگ‌تر می‌شود: «و از این جور چیزها». کتاب‌متاب، چای‌مای، بازی‌مازی.',
+      'پس بازی‌مازی یعنی بازی و هرچه با آن می‌آید: دوستانی که دور هم نشسته‌اند، بحث سر اینکه این شهر قبول است یا نه، و «یه دست دیگه». چیزی که واقعاً می‌سازیم همین است.',
+    ],
+    bazi: 'بازی، سرگرمی',
+    mazi: '…و از این جور چیزها',
+  },
+}[lang];
+---
+
+<section class="section section--paper name" id="name">
+  <Girih />
+  <div class="container name__grid">
+    <div class="name__words" aria-hidden="true">
+      <div class="name__word name__word--1">
+        <span class="persian-display">بازی</span>
+        <small class="latin">bāzi</small>
+        <em>{copy.bazi}</em>
+      </div>
+      <span class="name__plus">+</span>
+      <div class="name__word name__word--2">
+        <span class="persian-display"><b>م</b>ازی</span>
+        <small class="latin"><b>m</b>āzi</small>
+        <em>{copy.mazi}</em>
+      </div>
+    </div>
+    <div class="name__copy" data-reveal>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2>{copy.title}</h2>
+      {copy.body.map((p) => <p>{p}</p>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .name__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(40px, 6vw, 96px);
+    align-items: center;
+  }
+  .name__words {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 2vw, 24px);
+    direction: rtl;
+  }
+  .name__word {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+  .name__word .persian-display {
+    font-size: clamp(5rem, 11vw, 9.5rem);
+    line-height: 1.15;
+  }
+  .name__word--1 .persian-display {
+    color: #0c8378;
+  }
+  .name__word--2 .persian-display {
+    color: var(--orange);
+  }
+  .name__word b {
+    font-weight: inherit;
+    color: var(--anar);
+  }
+  .name__word small {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .name__word em {
+    font-style: normal;
+    font-size: 0.95rem;
+    opacity: 0.6;
+    margin-top: 4px;
+  }
+  .name__plus {
+    font-family: 'Bricolage Grotesque Variable', sans-serif;
+    font-size: 3rem;
+    font-weight: 300;
+    opacity: 0.4;
+    align-self: center;
+    margin-bottom: 3.5rem;
+  }
+  .name__copy {
+    display: grid;
+    gap: 18px;
+  }
+  .name__copy h2 {
+    font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+    margin-bottom: 6px;
+  }
+  .name__copy p:not(.eyebrow) {
+    font-size: 1.12rem;
+    color: var(--ink-soft);
+    max-width: 58ch;
+  }
+  @media (max-width: 860px) {
+    .name__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

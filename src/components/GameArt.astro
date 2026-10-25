@@ -1,0 +1,534 @@
+---
+/**
+ * Hand-drawn cover art for each game, as inline SVG so it stays crisp,
+ * themeable and weightless. Elements marked .a-* animate while the
+ * surrounding card is hovered, or always when `live` is set.
+ */
+interface Props {
+  slug: string;
+  live?: boolean;
+  class?: string;
+}
+
+const { slug, live = false, class: className } = Astro.props;
+const uid = Math.random().toString(36).slice(2, 8);
+const id = (name: string) => `${name}-${uid}`;
+const url = (name: string) => `url(#${id(name)})`;
+
+// Dots & Boxes board for Noqat: which edges are drawn and which boxes are captured.
+const cols = 6;
+const rows = 4;
+const step = 96;
+const ox = 160;
+const oy = 70;
+const dots = Array.from({ length: (cols + 1) * (rows + 1) }, (_, i) => ({ x: ox + (i % (cols + 1)) * step, y: oy + Math.floor(i / (cols + 1)) * step }));
+const captured = [
+  { c: 0, r: 0, p: 0 },
+  { c: 1, r: 0, p: 0 },
+  { c: 1, r: 1, p: 0 },
+  { c: 4, r: 2, p: 1 },
+  { c: 5, r: 2, p: 1 },
+  { c: 5, r: 3, p: 1 },
+  { c: 2, r: 3, p: 0 },
+];
+const hEdges = [
+  [0, 0], [1, 0], [2, 0], [4, 0], [0, 1], [1, 1], [3, 1], [5, 1], [1, 2], [2, 2], [4, 2], [5, 2], [2, 3], [4, 3], [5, 3], [0, 4], [2, 4], [3, 4], [5, 4],
+];
+const vEdges = [
+  [0, 0], [1, 0], [2, 0], [5, 0], [1, 1], [2, 1], [4, 2], [5, 2], [6, 2], [0, 2], [2, 3], [3, 3], [5, 3], [6, 3], [6, 0],
+];
+const star = (cx: number, cy: number, r: number) => {
+  const pts: string[] = [];
+  for (let i = 0; i < 16; i++) {
+    const a = (Math.PI / 8) * i - Math.PI / 2;
+    const rr = i % 2 === 0 ? r : r * 0.62;
+    pts.push(`${(cx + Math.cos(a) * rr).toFixed(1)},${(cy + Math.sin(a) * rr).toFixed(1)}`);
+  }
+  return pts.join(' ');
+};
+
+// Pachinko pegs for PLUMB.
+const pegs: { x: number; y: number }[] = [];
+for (let r = 0; r < 6; r++) {
+  for (let c = 0; c < 9 - (r % 2); c++) pegs.push({ x: 160 + c * 60 + (r % 2) * 30, y: 120 + r * 52 });
+}
+
+// Soulforge orbiting souls and approaching shades.
+const souls = Array.from({ length: 10 }, (_, i) => {
+  const a = (Math.PI * 2 * i) / 10;
+  return { x: 400 + Math.cos(a) * 92, y: 272 + Math.sin(a) * 92 };
+});
+const shades = [
+  [92, 330, 1], [150, 410, 0.8], [700, 360, 1], [640, 440, 0.9], [120, 200, 0.7], [720, 220, 0.75], [560, 460, 0.7], [250, 455, 0.85],
+];
+---
+
+<svg
+  class:list={['art', `art--${slug}`, { 'is-live': live }, className]}
+  viewBox="0 0 800 500"
+  preserveAspectRatio="xMidYMid slice"
+  aria-hidden="true"
+>
+  {
+    slug === 'esm-famil' && (
+      <g>
+        <rect width="800" height="500" fill="#f4eedf" />
+        <g transform="rotate(-6 380 260)">
+          <rect x="150" y="90" width="430" height="330" rx="6" fill="#e4d6bb" transform="translate(10 12)" />
+          <rect x="150" y="90" width="430" height="330" rx="6" fill="#fffdf6" />
+          <g stroke="#9fb0e6" stroke-width="1.5">
+            {Array.from({ length: 9 }, (_, i) => <line x1="150" x2="580" y1={150 + i * 30} y2={150 + i * 30} />)}
+          </g>
+          <line x1="540" x2="540" y1="90" y2="420" stroke="#e8603c" stroke-width="2" opacity="0.6" />
+          <g stroke="#25358f" stroke-width="2.5" fill="none">
+            <rect x="180" y="170" width="340" height="180" rx="4" />
+            <line x1="293" x2="293" y1="170" y2="350" />
+            <line x1="406" x2="406" y1="170" y2="350" />
+            <line x1="180" x2="520" y1="210" y2="210" />
+          </g>
+          <g font-family="'Vazirmatn Variable', sans-serif" fill="#25358f" text-anchor="middle" font-weight="700">
+            <text x="463" y="198" font-size="22">اسم</text>
+            <text x="350" y="198" font-size="22">فامیل</text>
+            <text x="237" y="198" font-size="22">شهر</text>
+            <g font-weight="500" font-size="24" fill="#2b4a7a">
+              <text x="463" y="252">سارا</text>
+              <text x="350" y="252">سهرابی</text>
+              <text x="237" y="252">ساری</text>
+              <text x="463" y="306">سامان</text>
+              <text x="350" y="306">ستوده</text>
+              <text x="237" y="306">سنندج</text>
+            </g>
+          </g>
+          <text x="365" y="132" font-family="Lalezar, sans-serif" font-size="34" fill="#25358f" text-anchor="middle">
+            دفتر دورهمی
+          </text>
+        </g>
+        <g transform="rotate(8 610 170)">
+          <g class="a-pop">
+          <rect x="530" y="70" width="170" height="200" rx="8" fill="#25358f" transform="translate(10 10)" />
+          <rect x="530" y="70" width="170" height="200" rx="8" fill="#e8603c" />
+          <text x="615" y="215" font-family="Lalezar, sans-serif" font-size="150" fill="#fffdf6" text-anchor="middle">
+            س
+          </text>
+          </g>
+        </g>
+        <g transform="rotate(32 300 440)">
+          <g class="a-slide">
+          <rect x="190" y="430" width="230" height="22" rx="4" fill="#f5b83a" />
+          <rect x="420" y="430" width="30" height="22" rx="3" fill="#e8603c" />
+          <path d="M190 430 150 441 190 452Z" fill="#f1d9a8" />
+          <path d="M162 437 150 441 162 445Z" fill="#25358f" />
+          </g>
+        </g>
+        <g fill="none" stroke="#e8603c" stroke-width="3" class="a-spin">
+          <circle cx="110" cy="110" r="10" />
+          {[0, 72, 144, 216, 288].map((a) => <ellipse cx="110" cy="88" rx="9" ry="13" transform={`rotate(${a} 110 110)`} />)}
+        </g>
+        <path d="M640 380c30 20 60 10 80-20" stroke="#25358f" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="2 9" />
+      </g>
+    )
+  }
+
+  {
+    slug === 'noqat' && (
+      <g>
+        <rect width="800" height="500" fill="#0f5c63" />
+        <circle cx="660" cy="80" r="220" fill="#137078" />
+        <circle cx="90" cy="470" r="160" fill="#0c4f55" />
+        {captured.map((b) => (
+          <g class={b.p === 0 ? 'a-pop' : 'a-pop a-delay'}>
+            <rect x={ox + b.c * step + 6} y={oy + b.r * step + 6} width={step - 12} height={step - 12} rx="6" fill={b.p === 0 ? '#f2c14e' : '#20c4b4'} opacity="0.95" />
+            <polygon points={star(ox + b.c * step + step / 2, oy + b.r * step + step / 2, 30)} fill="none" stroke={b.p === 0 ? '#8a5a00' : '#064a45'} stroke-width="3" />
+            <circle cx={ox + b.c * step + step / 2} cy={oy + b.r * step + step / 2} r="7" fill={b.p === 0 ? '#8a5a00' : '#064a45'} />
+          </g>
+        ))}
+        <g stroke-linecap="round" stroke-width="7">
+          {hEdges.map(([c, r], i) => (
+            <line x1={ox + c * step} x2={ox + (c + 1) * step} y1={oy + r * step} y2={oy + r * step} stroke={i % 3 === 0 ? '#f6a7b6' : '#f7f0e3'} />
+          ))}
+          {vEdges.map(([c, r], i) => (
+            <line x1={ox + c * step} x2={ox + c * step} y1={oy + r * step} y2={oy + (r + 1) * step} stroke={i % 4 === 1 ? '#f6a7b6' : '#f7f0e3'} />
+          ))}
+          <line class="a-draw" x1={ox + 3 * step} x2={ox + 4 * step} y1={oy + 2 * step} y2={oy + 2 * step} stroke="#f2c14e" stroke-dasharray="96" />
+        </g>
+        {dots.map((d) => <circle cx={d.x} cy={d.y} r="9" fill="#fff8e7" />)}
+      </g>
+    )
+  }
+
+  {
+    slug === 'dooz' && (
+      <g>
+        <rect width="800" height="500" fill="#1b2163" />
+        <g stroke="#2b3384" stroke-width="2">
+          {Array.from({ length: 19 }, (_, i) => <line x1={i * 45} x2={i * 45} y1="0" y2="500" />)}
+          {Array.from({ length: 12 }, (_, i) => <line y1={i * 45} y2={i * 45} x1="0" x2="800" />)}
+        </g>
+        <g transform="translate(250 100)">
+          <g stroke="#f7f0e3" stroke-width="12" stroke-linecap="round">
+            <line x1="100" x2="100" y1="0" y2="300" />
+            <line x1="200" x2="200" y1="0" y2="300" />
+            <line x1="0" x2="300" y1="100" y2="100" />
+            <line x1="0" x2="300" y1="200" y2="200" />
+          </g>
+          <g stroke="#ff8a1f" stroke-width="16" stroke-linecap="round" class="a-pop">
+            <path d="M22 22l56 56M78 22 22 78" />
+            <path d="M122 122l56 56M178 122l-56 56" />
+            <path d="M222 222l56 56M278 222l-56 56" />
+          </g>
+          <g fill="none" stroke="#20c4b4" stroke-width="14" class="a-pop a-delay">
+            <circle cx="250" cy="50" r="30" />
+            <circle cx="50" cy="250" r="30" />
+            <circle cx="150" cy="250" r="30" />
+          </g>
+          <line class="a-draw" x1="10" y1="10" x2="290" y2="290" stroke="#ffb81c" stroke-width="10" stroke-linecap="round" stroke-dasharray="400" opacity="0.9" />
+        </g>
+        <g fill="#ff8a1f" opacity="0.5">
+          <circle cx="110" cy="120" r="10" />
+          <circle cx="690" cy="390" r="14" />
+        </g>
+        <g fill="none" stroke="#20c4b4" stroke-width="5" opacity="0.5">
+          <circle cx="680" cy="110" r="22" />
+          <circle cx="120" cy="390" r="16" />
+        </g>
+      </g>
+    )
+  }
+
+  {
+    slug === 'spy' && (
+      <g>
+        <defs>
+          <radialGradient id={id('spot')} cx="50%" cy="0%" r="100%">
+            <stop offset="0" stop-color="#fff3d6" stop-opacity="0.55" />
+            <stop offset="1" stop-color="#fff3d6" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <rect width="800" height="500" fill="#17122b" />
+        <g stroke="#221a3d" stroke-width="3">
+          {Array.from({ length: 12 }, (_, i) => <line x1="0" x2="800" y1={i * 44 + 10} y2={i * 44 + 10} />)}
+          {Array.from({ length: 12 }, (_, i) => Array.from({ length: 10 }, (_, j) => <line x1={j * 90 + (i % 2) * 45} x2={j * 90 + (i % 2) * 45} y1={i * 44 + 10} y2={i * 44 + 54} />))}
+        </g>
+        <path class="a-sway" d="M400 -20 250 520h300Z" fill={url('spot')} />
+        <circle cx="400" cy="250" r="140" fill="#ff6b3d" />
+        <g fill="#17122b">
+          <ellipse cx="400" cy="215" rx="125" ry="22" />
+          <path d="M318 214c0-62 26-98 82-98s82 36 82 98Z" />
+          <path d="M340 240h120c0 70-28 112-60 112s-60-42-60-112Z" />
+        </g>
+        <rect x="318" y="196" width="164" height="16" fill="#ff6b3d" opacity="0.9" />
+        <g fill="#0c0918" stroke="#f7f0e3" stroke-width="3">
+          <rect x="345" y="252" width="48" height="30" rx="10" />
+          <rect x="407" y="252" width="48" height="30" rx="10" />
+        </g>
+        <path d="M393 262h14" stroke="#f7f0e3" stroke-width="3" />
+        <path class="a-glint" d="M356 258l10 18M418 258l10 18" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.8" />
+        <g transform="rotate(-14 160 380)">
+          <rect x="100" y="300" width="110" height="150" rx="12" fill="#f7f0e3" />
+          <text x="155" y="390" font-family="'Vazirmatn Variable', sans-serif" font-weight="800" font-size="30" fill="#17122b" text-anchor="middle">
+            انار
+          </text>
+        </g>
+        <g transform="rotate(12 650 380)">
+          <g class="a-pop">
+          <rect x="590" y="300" width="110" height="150" rx="12" fill="#ff6b3d" />
+          <text x="645" y="400" font-family="Lalezar, sans-serif" font-size="70" fill="#17122b" text-anchor="middle">
+            ؟
+          </text>
+          </g>
+        </g>
+      </g>
+    )
+  }
+
+  {
+    slug === 'bball' && (
+      <g>
+        <defs>
+          <filter id={id('glow')} x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="8" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id={id('trail')} x1="0" x2="1">
+            <stop offset="0" stop-color="#3ff1e0" stop-opacity="0" />
+            <stop offset="1" stop-color="#3ff1e0" stop-opacity="0.9" />
+          </linearGradient>
+        </defs>
+        <rect width="800" height="500" fill="#05070f" />
+        <g stroke="#1d3a6e" stroke-width="1.5" opacity="0.9">
+          {Array.from({ length: 13 }, (_, i) => <line x1={400 + (i - 6) * 30} y1="150" x2={400 + (i - 6) * 140} y2="520" />)}
+          {[160, 185, 215, 252, 298, 355, 425, 510].map((y) => <line x1="0" x2="800" y1={y} y2={y} />)}
+        </g>
+        <line x1="400" x2="400" y1="150" y2="500" stroke="#3a7bd5" stroke-width="3" stroke-dasharray="10 10" opacity="0.8" />
+        <rect x="150" y="190" width="22" height="130" rx="11" fill="#3ff1e0" filter={url('glow')} />
+        <rect x="630" y="230" width="22" height="130" rx="11" fill="#ff4d8d" filter={url('glow')} />
+        <path d="M175 290C300 200 480 180 600 250" stroke={url('trail')} stroke-width="14" fill="none" stroke-linecap="round" filter={url('glow')} />
+        <circle class="a-ball" cx="606" cy="252" r="16" fill="#fff" filter={url('glow')} />
+        <g stroke="#ff4d8d" stroke-width="3" stroke-linecap="round" class="a-spark">
+          <path d="M626 236l14-12M628 262l16 8M620 220l6-18" />
+        </g>
+      </g>
+    )
+  }
+
+  {
+    slug === 'bounce-defense' && (
+      <g>
+        <defs>
+          <filter id={id('glow')} x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <rect width="800" height="500" fill="#2a0e2e" />
+        <g class="a-march">
+          {[0, 1, 2].map((r) =>
+            [0, 1, 2, 3, 4, 5, 6].map((c) =>
+              (r + c) % 3 !== 1 ? (
+                <g transform={`translate(${130 + c * 82 + (r % 2) * 30} ${50 + r * 72})`}>
+                  <rect width="52" height="52" rx="14" fill={['#e8434a', '#9b5de5', '#ff8a1f'][(r + c) % 3]} />
+                  <circle cx="18" cy="22" r="5" fill="#2a0e2e" />
+                  <circle cx="34" cy="22" r="5" fill="#2a0e2e" />
+                </g>
+              ) : null,
+            ),
+          )}
+        </g>
+        <polyline points="400,460 250,300 520,170 640,330 330,250" fill="none" stroke="#ffb81c" stroke-width="5" stroke-linejoin="round" stroke-dasharray="14 10" filter={url('glow')} />
+        {[
+          [250, 300],
+          [520, 170],
+          [640, 330],
+        ].map(([x, y]) => (
+          <polygon class="a-burst" points={star(x, y, 26)} fill="#fff3c4" opacity="0.9" />
+        ))}
+        <circle class="a-ball" cx="330" cy="250" r="18" fill="#ffb81c" filter={url('glow')} />
+        <line x1="40" x2="760" y1="430" y2="430" stroke="#20c4b4" stroke-width="4" stroke-dasharray="20 12" />
+        <path d="M370 470h60l-30-34Z" fill="#20c4b4" />
+      </g>
+    )
+  }
+
+  {
+    slug === 'plumb' && (
+      <g>
+        <defs>
+          <radialGradient id={id('sphere')} cx="35%" cy="30%" r="70%">
+            <stop offset="0" stop-color="#ffffff" />
+            <stop offset="0.45" stop-color="#cfd6e6" />
+            <stop offset="1" stop-color="#5b6377" />
+          </radialGradient>
+          <radialGradient id={id('peg')} cx="35%" cy="30%" r="70%">
+            <stop offset="0" stop-color="#ffe7a3" />
+            <stop offset="1" stop-color="#b9822a" />
+          </radialGradient>
+        </defs>
+        <rect width="800" height="500" fill="#3b2412" />
+        <g fill="none" stroke="#5a3a1d" stroke-width="14" class="a-spin-slow">
+          <circle cx="70" cy="70" r="70" stroke-dasharray="18 12" />
+        </g>
+        <g fill="none" stroke="#5a3a1d" stroke-width="12" class="a-spin-rev">
+          <circle cx="740" cy="430" r="80" stroke-dasharray="16 12" />
+        </g>
+        {pegs.map((p) => (
+          <circle cx={p.x} cy={p.y} r="9" fill={url('peg')} />
+        ))}
+        <path d="M400 20C404 90 360 110 370 168s58 60 52 120-64 70-40 150" fill="none" stroke="#f5c35b" stroke-width="3" stroke-dasharray="3 10" stroke-linecap="round" />
+        <circle class="a-ball" cx="396" cy="210" r="22" fill={url('sphere')} />
+        {[0, 1, 2, 3, 4].map((i) => (
+          <path d={`M${120 + i * 130} 470v-34h96v34`} fill="none" stroke={i === 2 ? '#f5c35b' : '#8a6a3a'} stroke-width="6" stroke-linejoin="round" />
+        ))}
+        <text x="376" y="430" font-family="'Bricolage Grotesque Variable', sans-serif" font-weight="800" font-size="22" fill="#f5c35b">
+          ×5
+        </text>
+      </g>
+    )
+  }
+
+  {
+    slug === 'soulforge' && (
+      <g>
+        <defs>
+          <radialGradient id={id('forge')} cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#ffb35c" stop-opacity="0.9" />
+            <stop offset="0.4" stop-color="#ff5a2a" stop-opacity="0.35" />
+            <stop offset="1" stop-color="#ff5a2a" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <rect width="800" height="500" fill="#120a1c" />
+        <path d="M640 70a50 50 0 1 0 40 80 42 42 0 1 1-40-80Z" fill="#f7f0e3" opacity="0.85" />
+        <g fill="#f7f0e3" opacity="0.6">
+          <circle cx="120" cy="60" r="2" />
+          <circle cx="220" cy="110" r="1.5" />
+          <circle cx="520" cy="50" r="2" />
+          <circle cx="760" cy="200" r="1.5" />
+          <circle cx="40" cy="160" r="1.5" />
+        </g>
+        <path d="M0 380c120-40 220-30 320 0s260 30 480-20v140H0Z" fill="#1d1230" />
+        <circle cx="400" cy="272" r="200" fill={url('forge')} />
+        <g class="a-orbit">
+          {souls.map((s) => (
+            <circle cx={s.x} cy={s.y} r="9" fill="#ffd28a" />
+          ))}
+        </g>
+        <path d="M400 236l18 36-18 36-18-36Z" fill="#fff3d6" />
+        {shades.map(([x, y, s]) => (
+          <g transform={`translate(${x} ${y}) scale(${s})`}>
+            <path d="M-26 30c0-40 8-62 26-62s26 22 26 62l-9-8-8 8-9-8-9 8-8-8Z" fill="#2c1b44" />
+            <circle cx="-8" cy="-12" r="4" fill="#ff4d4d" />
+            <circle cx="8" cy="-12" r="4" fill="#ff4d4d" />
+          </g>
+        ))}
+        <g fill="#ff7a3d" class="a-rise">
+          <circle cx="360" cy="420" r="3" />
+          <circle cx="430" cy="440" r="2.5" />
+          <circle cx="470" cy="400" r="2" />
+          <circle cx="330" cy="380" r="2" />
+        </g>
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .art {
+    width: 100%;
+    height: 100%;
+  }
+  /* Only animated parts get a box origin; static parts keep their SVG transforms intact. */
+  .art [class^='a-'],
+  .art [class*=' a-'] {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.game-card:hover) .art .a-pop,
+    .art.is-live .a-pop {
+      animation: a-pop 0.8s var(--ease-spring) both;
+    }
+    :global(.game-card:hover) .art .a-delay,
+    .art.is-live .a-delay {
+      animation-delay: 0.15s;
+    }
+    :global(.game-card:hover) .art .a-draw,
+    .art.is-live .a-draw {
+      animation: a-draw 1.2s var(--ease-out) both;
+    }
+    :global(.game-card:hover) .art .a-ball,
+    .art.is-live .a-ball {
+      animation: a-ball 1.6s ease-in-out infinite;
+    }
+    :global(.game-card:hover) .art .a-spin,
+    .art.is-live .a-spin {
+      animation: a-spin 6s linear infinite;
+    }
+    :global(.game-card:hover) .art .a-spin-slow,
+    .art.is-live .a-spin-slow {
+      animation: a-spin 14s linear infinite;
+    }
+    :global(.game-card:hover) .art .a-spin-rev,
+    .art.is-live .a-spin-rev {
+      animation: a-spin 14s linear infinite reverse;
+    }
+    :global(.game-card:hover) .art .a-sway,
+    .art.is-live .a-sway {
+      transform-origin: 50% 0;
+      animation: a-sway 3s ease-in-out infinite;
+    }
+    :global(.game-card:hover) .art .a-glint,
+    .art.is-live .a-glint {
+      animation: a-glint 2s ease-in-out infinite;
+    }
+    :global(.game-card:hover) .art .a-spark,
+    .art.is-live .a-spark,
+    :global(.game-card:hover) .art .a-burst,
+    .art.is-live .a-burst {
+      animation: a-burst 1.6s ease-out infinite;
+    }
+    :global(.game-card:hover) .art .a-march,
+    .art.is-live .a-march {
+      animation: a-march 2.4s ease-in-out infinite;
+    }
+    :global(.game-card:hover) .art .a-orbit,
+    .art.is-live .a-orbit {
+      animation: a-spin 10s linear infinite;
+    }
+    :global(.game-card:hover) .art .a-rise,
+    .art.is-live .a-rise {
+      animation: a-rise 2.5s ease-out infinite;
+    }
+    :global(.game-card:hover) .art .a-slide,
+    .art.is-live .a-slide {
+      animation: a-slide 1.4s ease-in-out infinite alternate;
+    }
+  }
+  @keyframes a-pop {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+  }
+  @keyframes a-draw {
+    from {
+      stroke-dashoffset: 400;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes a-ball {
+    50% {
+      transform: translateY(-14px) scale(1.06);
+    }
+  }
+  @keyframes a-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes a-sway {
+    50% {
+      transform: rotate(6deg);
+    }
+  }
+  @keyframes a-glint {
+    50% {
+      opacity: 0.1;
+    }
+  }
+  @keyframes a-burst {
+    0% {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.3);
+      opacity: 0;
+    }
+  }
+  @keyframes a-march {
+    50% {
+      transform: translateY(14px);
+    }
+  }
+  @keyframes a-rise {
+    to {
+      transform: translateY(-80px);
+      opacity: 0;
+    }
+  }
+  @keyframes a-slide {
+    to {
+      transform: translate(-12px, -8px);
+    }
+  }
+</style>

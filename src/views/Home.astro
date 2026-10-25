@@ -1,0 +1,423 @@
+---
+import DoozMini from '~/components/DoozMini.astro';
+import GameCard from '~/components/GameCard.astro';
+import Girih from '~/components/Girih.astro';
+import Hero from '~/components/Hero.astro';
+import Icon, { type IconName } from '~/components/Icon.astro';
+import JoinCta from '~/components/JoinCta.astro';
+import LabGrid from '~/components/LabGrid.astro';
+import Marquee from '~/components/Marquee.astro';
+import NameStory from '~/components/NameStory.astro';
+import Partyframe from '~/components/Partyframe.astro';
+import Base from '~/layouts/Base.astro';
+import { repoUrl } from '~/config';
+import { gameBySlug } from '~/data/games';
+import { getActivity } from '~/data/github';
+import { formatDate, localize, t, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = t(lang);
+const activity = (await getActivity()).slice(0, 6);
+const g = (slug: string) => gameBySlug(slug)!;
+
+const copy = {
+  en: {
+    description:
+      'bazimazi is an open game studio making simple, culture-rich games inspired by Iran: Esm-Famil, Dots & Boxes, Dooz, Spy and more. Every game is open source on GitHub.',
+    games: {
+      eyebrow: 'The games',
+      title: 'Old favourites, new tricks.',
+      body: 'We start with the games people already play around the kitchen table, then rebuild them with real engines, honest AI and a lot of care.',
+      more: 'Arcade and roguelites',
+    },
+    play: {
+      eyebrow: 'Play a round',
+      title: 'Go on. Beat the bot.',
+      body: 'This is dooz on a 3×3 board, against a bot that plays perfectly. The best you can do is a draw, and against this bot a draw is a win. The full game goes up to 9×9, with online play.',
+    },
+    open: {
+      eyebrow: 'Open by default',
+      title: 'An open studio. Really open.',
+      body: 'Most studios show you the trailer. We show you the repository. Every game we make is public on GitHub from its first commit, under the MIT license.',
+      principles: [
+        { icon: 'code', title: 'Every line is public', text: 'From the first prototype to the final polish, our games are developed in the open. Read them, learn from them, fork them.' },
+        { icon: 'heart', title: 'Culture first', text: 'Persian games, stories, patterns and music are our raw material. We build what we grew up playing, then push it further.' },
+        { icon: 'sparkle', title: 'Small and sharp', text: 'Easy to pick up, hard to put down. We would rather ship one tight idea than a dozen loose ones.' },
+        { icon: 'device', title: 'Play anywhere', text: 'Web first. Then installable, desktop and mobile, from the same codebase.' },
+      ],
+      comment: "# that's it. you're a game developer now.",
+      activity: 'Right now on GitHub',
+    },
+    lab: {
+      eyebrow: 'The Lab',
+      title: 'One question, asked fifteen ways.',
+      body: 'In the last week of September 2026 we asked ourselves one question: what else can a bouncing ball be? We answered it fifteen times, and two of the answers grew into full games.',
+      bounce: 'The Bounce Lab',
+      bounceWhen: 'September 2026',
+      worlds: 'Worlds and systems',
+      worldsWhen: 'October 2026',
+      worldsBody: 'Then the questions got bigger: creatures, dungeons, universes and very long nights.',
+      forkTitle: 'Fork one',
+      forkText: 'Every prototype is MIT-licensed. Pick one up and take it further.',
+      pitchTitle: 'Your experiment here',
+      pitchText: 'Pitch an idea in an issue, or skip the pitch and open a pull request.',
+    },
+  },
+  fa: {
+    description:
+      'بازی مازی یک استودیوی بازی‌سازی باز است که بازی‌های ساده و پر از فرهنگ ایرانی می‌سازد: اسم فامیل، نقطه‌خط، دوز، جاسوس و بیشتر. همهٔ بازی‌ها متن‌باز و در گیت‌هاب‌اند.',
+    games: {
+      eyebrow: 'بازی‌ها',
+      title: 'بازی‌های قدیمی، ترفندهای تازه.',
+      body: 'از بازی‌هایی شروع می‌کنیم که همه دور سفره و پشت دفتر مشق بازی کرده‌اند، و بعد با موتورهای واقعی، هوش مصنوعی صادق و کلی حوصله از نو می‌سازیمشان.',
+      more: 'آرکید و روگ‌لایت',
+    },
+    play: {
+      eyebrow: 'یه دست بازی',
+      title: 'بفرما. ربات را ببر.',
+      body: 'این دوز روی صفحهٔ ۳×۳ است، در برابر رباتی که بی‌نقص بازی می‌کند. بهترین نتیجه‌ات مساوی است، و در برابر این ربات مساوی یعنی بُرد. بازی کامل تا ۹×۹ پیش می‌رود و بازی آنلاین هم دارد.',
+    },
+    open: {
+      eyebrow: 'باز، از روز اول',
+      title: 'یک استودیوی باز. واقعاً باز.',
+      body: 'بیشتر استودیوها تریلر نشانت می‌دهند؛ ما مخزن کد را. هر بازی‌ای که می‌سازیم از اولین کامیتش در گیت‌هاب عمومی است، با مجوز MIT.',
+      principles: [
+        { icon: 'code', title: 'همهٔ کد عمومی است', text: 'از اولین نمونه تا آخرین صیقل، بازی‌هایمان در فضای باز ساخته می‌شوند. بخوانیدشان، از آنها یاد بگیرید، فورکشان کنید.' },
+        { icon: 'heart', title: 'اول فرهنگ', text: 'بازی‌ها، قصه‌ها، نقش‌ها و موسیقی ایرانی مادهٔ خام ماست. چیزی را می‌سازیم که با آن بزرگ شده‌ایم، و بعد جلوتر می‌بریمش.' },
+        { icon: 'sparkle', title: 'کوچک و دقیق', text: 'شروعش آسان، کنار گذاشتنش سخت. یک ایدهٔ دقیق را به ده ایدهٔ شل ترجیح می‌دهیم.' },
+        { icon: 'device', title: 'همه‌جا بازی کن', text: 'اول وب. بعد نسخهٔ نصبی، دسکتاپ و موبایل، همه از یک کد.' },
+      ],
+      comment: '# that’s it. you’re a game developer now.',
+      activity: 'همین حالا در گیت‌هاب',
+    },
+    lab: {
+      eyebrow: 'آزمایشگاه',
+      title: 'یک سؤال، به پانزده شکل.',
+      body: 'روزهای اول مهر ۱۴۰۵ یک سؤال از خودمان پرسیدیم: یک توپ جهنده دیگر چه می‌تواند باشد؟ و پانزده بار جوابش را دادیم. دوتا از این جواب‌ها بزرگ شدند و بازی کامل شدند.',
+      bounce: 'آزمایشگاه جهش',
+      bounceWhen: 'مهر ۱۴۰۵',
+      worlds: 'جهان‌ها و سیستم‌ها',
+      worldsWhen: 'مهر ۱۴۰۵',
+      worldsBody: 'بعد سؤال‌ها بزرگ‌تر شدند: موجودات، سیاه‌چال‌ها، کهکشان‌ها و شب‌هایی خیلی طولانی.',
+      forkTitle: 'یکی را فورک کن',
+      forkText: 'همهٔ نمونه‌ها مجوز MIT دارند. یکی را بردار و جلوتر ببر.',
+      pitchTitle: 'آزمایش تو اینجا',
+      pitchText: 'ایده‌ات را در یک issue مطرح کن، یا اصلاً مستقیم یک pull request بفرست.',
+    },
+  },
+}[lang];
+const principles = copy.open.principles as { icon: IconName; title: string; text: string }[];
+---
+
+<Base lang={lang} description={copy.description}>
+  <Hero lang={lang} />
+  <Marquee />
+
+  <section class="section section--paper games" id="games">
+    <Girih />
+    <div class="container">
+      <div class="games__head">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow">{copy.games.eyebrow}</p>
+          <h2>{copy.games.title}</h2>
+          <p>{copy.games.body}</p>
+        </div>
+        <a class="btn btn--ink games__all" href={localize('/games/', lang)}>
+          {ui.allGames}
+          <Icon name="arrow" class="flip" />
+        </a>
+      </div>
+
+      <div class="games__grid">
+        <div class="span-6" data-reveal><GameCard game={g('esm-famil')} lang={lang} size="wide" /></div>
+        <div class="span-2" data-reveal style="--reveal-delay:0"><GameCard game={g('noqat')} lang={lang} /></div>
+        <div class="span-2" data-reveal style="--reveal-delay:90"><GameCard game={g('dooz')} lang={lang} /></div>
+        <div class="span-2 span-2--odd" data-reveal style="--reveal-delay:180"><GameCard game={g('spy')} lang={lang} /></div>
+        <h3 class="games__sub span-6" data-reveal>{copy.games.more}</h3>
+        <div class="span-3" data-reveal><GameCard game={g('bball')} lang={lang} /></div>
+        <div class="span-3" data-reveal style="--reveal-delay:90"><GameCard game={g('bounce-defense')} lang={lang} /></div>
+        <div class="span-3" data-reveal><GameCard game={g('plumb')} lang={lang} /></div>
+        <div class="span-3" data-reveal style="--reveal-delay:90"><GameCard game={g('soulforge')} lang={lang} /></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--night play" id="play">
+    <div class="container play__grid">
+      <div class="section-head play__head" data-reveal>
+        <p class="eyebrow">{copy.play.eyebrow}</p>
+        <h2>{copy.play.title}</h2>
+        <p>{copy.play.body}</p>
+      </div>
+      <div class="play__board" data-reveal style="--reveal-delay:120">
+        <DoozMini lang={lang} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper open" id="open">
+    <Girih />
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">{copy.open.eyebrow}</p>
+        <h2>{copy.open.title}</h2>
+        <p>{copy.open.body}</p>
+      </div>
+      <ul class="open__principles" role="list">
+        {
+          principles.map((p, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 80}`}>
+              <span class="open__icon">
+                <Icon name={p.icon} size={24} />
+              </span>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="open__bottom">
+        <div class="terminal" data-reveal>
+          <div class="terminal__bar"><i></i><i></i><i></i><span>~/games</span></div>
+          <pre id="clone-dooz"><span data-line><span class="prompt">$ </span>git clone https://github.com/bazimazi/dooz</span>
+<span data-line><span class="prompt">$ </span>cd dooz/src</span>
+<span data-line><span class="prompt">$ </span>npm install</span>
+<span data-line><span class="prompt">$ </span>npm run dev</span>
+<span class="comment">{copy.open.comment}</span></pre>
+          <button class="copy-btn" type="button" data-copy="clone-dooz" data-copied={ui.copied}>{ui.copy}</button>
+        </div>
+        <div class="open__activity" data-reveal style="--reveal-delay:120">
+          <h3><span class="pill pill--live">{copy.open.activity}</span></h3>
+          <ol role="list">
+            {
+              activity.map((repo) => (
+                <li>
+                  <a href={repoUrl(repo.name)}>
+                    <span class="latin open__repo">{repo.name}</span>
+                    <time datetime={repo.pushedAt} data-relative>
+                      {formatDate(repo.pushedAt, lang, { day: 'numeric', month: 'short' })}
+                    </time>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--deep lab" id="lab">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">{copy.lab.eyebrow}</p>
+        <h2>{copy.lab.title}</h2>
+        <p>{copy.lab.body}</p>
+      </div>
+      <h3 class="lab__series" data-reveal>{copy.lab.bounce} <span>{copy.lab.bounceWhen}</span></h3>
+      <LabGrid lang={lang} series="bounce" cta={{ title: copy.lab.forkTitle, text: copy.lab.forkText }} />
+      <h3 class="lab__series lab__series--gap" data-reveal>{copy.lab.worlds} <span>{copy.lab.worldsWhen}</span></h3>
+      <p class="lab__note" data-reveal>{copy.lab.worldsBody}</p>
+      <LabGrid lang={lang} series="worlds" cta={{ title: copy.lab.pitchTitle, text: copy.lab.pitchText }} />
+    </div>
+  </section>
+
+  <section class="section section--night" id="partyframe">
+    <div class="container">
+      <Partyframe lang={lang} />
+    </div>
+  </section>
+
+  <NameStory lang={lang} />
+  <JoinCta lang={lang} />
+</Base>
+
+<style>
+  .games__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .games__all {
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+  .games__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .games__grid > div {
+    display: grid;
+  }
+  .span-6 {
+    grid-column: span 6;
+  }
+  .span-3 {
+    grid-column: span 3;
+  }
+  .span-2 {
+    grid-column: span 2;
+  }
+  .games__sub {
+    margin-top: 40px;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+  }
+  @media (max-width: 900px) {
+    .span-2 {
+      grid-column: span 3;
+    }
+    .span-2--odd {
+      grid-column: span 6;
+    }
+  }
+  @media (max-width: 680px) {
+    .games__grid > * {
+      grid-column: 1 / -1 !important;
+    }
+  }
+
+  .play {
+    background:
+      radial-gradient(700px 500px at 80% 50%, rgb(32 196 180 / 0.14), transparent 70%),
+      var(--night-900);
+  }
+  .play__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 60px;
+    align-items: center;
+  }
+  .play__head {
+    margin-bottom: 0;
+  }
+  @media (max-width: 860px) {
+    .play__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .open__principles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .open__principles li {
+    padding: 28px;
+    border-radius: var(--radius);
+    background: var(--paper-2);
+  }
+  .open__principles h3 {
+    font-size: 1.4rem;
+    margin-block: 20px 10px;
+  }
+  .open__principles p {
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+  }
+  .open__icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: var(--ink);
+    color: var(--saffron);
+  }
+  .open__principles li:nth-child(2) .open__icon {
+    color: var(--anar);
+  }
+  .open__principles li:nth-child(3) .open__icon {
+    color: var(--firouzeh);
+  }
+  .open__principles li:nth-child(4) .open__icon {
+    color: var(--rose);
+  }
+  .open__bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .open__activity {
+    padding: 28px;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .open__activity h3 {
+    margin-bottom: 14px;
+  }
+  .open__activity .pill {
+    font-family: var(--font-body);
+    letter-spacing: 0;
+  }
+  .open__activity ol {
+    display: grid;
+  }
+  .open__activity a {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .open__activity li:last-child a {
+    border-bottom: 0;
+  }
+  .open__activity a:hover {
+    color: var(--saffron);
+  }
+  .open__repo {
+    font-weight: 650;
+  }
+  .open__activity time {
+    opacity: 0.55;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  @media (max-width: 1000px) {
+    .open__principles {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .open__bottom {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .open__principles {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .lab__series {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 20px;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+  }
+  .lab__series span {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    opacity: 0.5;
+  }
+  .lab__series--gap {
+    margin-top: 72px;
+    margin-bottom: 8px;
+  }
+  .lab__note {
+    opacity: 0.7;
+    margin-bottom: 22px;
+  }
+</style>

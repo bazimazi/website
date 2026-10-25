@@ -1,0 +1,581 @@
+---
+import Girih from '~/components/Girih.astro';
+import Icon, { type IconName } from '~/components/Icon.astro';
+import Mascot from '~/components/Mascot.astro';
+import NameStory from '~/components/NameStory.astro';
+import PageHead from '~/components/PageHead.astro';
+import Base from '~/layouts/Base.astro';
+import { SITE } from '~/config';
+import { getRepos } from '~/data/github';
+import { formatDate, localize, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const repos = await getRepos();
+const created = (name: string) => repos.find((r) => r.name === name)?.createdAt ?? '';
+
+const copy = {
+  en: {
+    title: 'Studio',
+    description: 'bazimazi is an open, independent game studio based in Germany, making simple and accessible games inspired by Iranian and Persian culture.',
+    eyebrow: 'The studio',
+    heading: 'A small studio with a big table.',
+    lead: 'bazimazi is an open, independent game studio based in Germany. We make simple, fun and accessible games inspired by Iranian and Persian culture: familiar stories, traditions and patterns, turned into games that are easy to pick up and hard to put down.',
+    beliefsEyebrow: 'How we work',
+    beliefsTitle: 'Four habits we try to keep.',
+    beliefs: [
+      { icon: 'brush', title: 'Culture is a craft', text: 'We research before we design. Noqat’s Persian skin plays in Dastgāh-e Shur; Esm-Famil accepts ی and ي alike. The details are the point.' },
+      { icon: 'translate', title: 'Persian first, not Persian only', text: 'Right-to-left layouts, Persian digits and good Persian type are defaults, not afterthoughts. English follows, and other languages are welcome.' },
+      { icon: 'cpu', title: 'Honest AI', text: 'Our bots are weak in human ways and strong in real ones. When a bot is perfect, we tell you so before you play it.' },
+      { icon: 'sparkle', title: 'Prototype in public', text: 'We would rather show fifteen rough experiments than keep one polished secret. Unfinished is fine. Hidden is not.' },
+    ],
+    timelineEyebrow: 'So far',
+    timelineTitle: 'A short history, told in repositories.',
+    timeline: [
+      { repo: 'esfamil', text: 'bazimazi opens on GitHub with Esm-Famil, the word game every Iranian knows.' },
+      { repo: 'dooz', text: 'Dooz arrives, written once in every major front-end framework to compare them.' },
+      { repo: 'noqat', text: 'Noqat starts its long road to a properly strong Dots & Boxes engine.' },
+      { repo: 'spy', text: 'Spy brings pass-the-phone party play, fully offline.' },
+      { repo: 'bBall', text: 'bBall, a neon duel, and our first arcade game.' },
+      { repo: 'partyframe', text: 'partyframe: a framework so anyone can build TV-and-phones party games.' },
+      { repo: 'BounceBound', text: 'The Bounce Lab: fifteen prototypes about one bouncing ball.' },
+      { repo: 'Lifeform', text: 'Worlds and systems: creatures, dungeons, universes and roguelites.' },
+      { repo: 'website', text: 'This website, built in the open like everything else.' },
+    ],
+    pressEyebrow: 'Press and brand',
+    pressTitle: 'Everything you need to write about us.',
+    pressBody: 'Use these freely when writing about bazimazi. Please keep the mascot friendly, and the colours warm.',
+    boilerplateTitle: 'About bazimazi, in one paragraph',
+    boilerplate:
+      'bazimazi is an open, independent game studio based in Germany. It makes simple, accessible games inspired by Iranian and Persian culture, from classics like Esm-Famil, Dots & Boxes and Dooz to arcade duels and roguelites. Every bazimazi game is open source under the MIT license at github.com/bazimazi.',
+    assets: 'Downloads',
+    mark: 'Logo mark (SVG)',
+    mascot: 'Mascot (SVG)',
+    colours: 'Colours',
+    type: 'Typefaces',
+    copy: 'Copy',
+    copied: 'Copied',
+    contactTitle: 'Say hello',
+    contactBody: 'Questions, ideas, press, or a game you think we should remake: we read everything.',
+  },
+  fa: {
+    title: 'استودیو',
+    description: 'بازی مازی یک استودیوی بازی‌سازی مستقل و باز در آلمان است که بازی‌های ساده و در دسترس با الهام از فرهنگ ایرانی می‌سازد.',
+    eyebrow: 'استودیو',
+    heading: 'یک استودیوی کوچک با یک سفرهٔ بزرگ.',
+    lead: 'بازی مازی یک استودیوی بازی‌سازی مستقل و باز در آلمان است. بازی‌هایی ساده، سرگرم‌کننده و در دسترس می‌سازیم که از فرهنگ ایرانی الهام گرفته‌اند: قصه‌ها، رسم‌ها و نقش‌های آشنا، که به بازی‌هایی تبدیل می‌شوند با شروعی آسان و دل‌کندنی سخت.',
+    beliefsEyebrow: 'چطور کار می‌کنیم',
+    beliefsTitle: 'چهار عادتی که سعی می‌کنیم نگهشان داریم.',
+    beliefs: [
+      { icon: 'brush', title: 'فرهنگ یعنی صنعت‌گری', text: 'پیش از طراحی تحقیق می‌کنیم. پوستهٔ ایرانی نقطه‌خط در دستگاه شور می‌نوازد و اسم فامیل «ی» فارسی و «ي» عربی را یکی می‌داند. نکته همین جزئیات است.' },
+      { icon: 'translate', title: 'اول فارسی، نه فقط فارسی', text: 'چیدمان راست‌به‌چپ، اعداد فارسی و حروف‌نگاری خوب فارسی پیش‌فرض‌اند، نه وصله‌ای بعدی. انگلیسی پشت سرش می‌آید و زبان‌های دیگر هم خوش‌آمدند.' },
+      { icon: 'cpu', title: 'هوش مصنوعی صادق', text: 'ربات‌هایمان به شکلی انسانی ضعیف‌اند و به شکلی واقعی قوی. وقتی رباتی بی‌نقص است، پیش از بازی به تو می‌گوییم.' },
+      { icon: 'sparkle', title: 'نمونه‌سازی در فضای باز', text: 'ترجیح می‌دهیم پانزده آزمایش نیمه‌کاره نشان بدهیم تا یک راز صیقل‌خورده نگه داریم. نیمه‌کاره اشکالی ندارد؛ پنهان‌کاری دارد.' },
+    ],
+    timelineEyebrow: 'تا اینجا',
+    timelineTitle: 'تاریخچه‌ای کوتاه، به روایت مخزن‌ها.',
+    timeline: [
+      { repo: 'esfamil', text: 'بازی مازی با اسم فامیل، بازی‌ای که هر ایرانی می‌شناسد، در گیت‌هاب شروع می‌شود.' },
+      { repo: 'dooz', text: 'دوز از راه می‌رسد؛ یک بار با هر چارچوب مهم فرانت‌اند نوشته می‌شود تا با هم مقایسه شوند.' },
+      { repo: 'noqat', text: 'نقطه‌خط راه طولانی‌اش را به سوی یک موتور واقعاً قوی آغاز می‌کند.' },
+      { repo: 'spy', text: 'جاسوس، بازی گروهی دست‌به‌دست با یک گوشی، کاملاً آفلاین.' },
+      { repo: 'bBall', text: 'bBall، یک دوئل نئونی و اولین بازی آرکید ما.' },
+      { repo: 'partyframe', text: 'partyframe: چارچوبی تا هر کسی بتواند بازی گروهی با تلویزیون و گوشی بسازد.' },
+      { repo: 'BounceBound', text: 'آزمایشگاه جهش: پانزده نمونه دربارهٔ یک توپ جهنده.' },
+      { repo: 'Lifeform', text: 'جهان‌ها و سیستم‌ها: موجودات، سیاه‌چال‌ها، کهکشان‌ها و روگ‌لایت‌ها.' },
+      { repo: 'website', text: 'همین وب‌سایت، که مثل همه‌چیز دیگر در فضای باز ساخته شده.' },
+    ],
+    pressEyebrow: 'رسانه و برند',
+    pressTitle: 'هر چیزی که برای نوشتن دربارهٔ ما لازم داری.',
+    pressBody: 'برای نوشتن دربارهٔ بازی مازی آزادانه از اینها استفاده کن. فقط شخصیتمان را مهربان و رنگ‌ها را گرم نگه دار.',
+    boilerplateTitle: 'بازی مازی در یک پاراگراف',
+    boilerplate:
+      'بازی مازی یک استودیوی بازی‌سازی مستقل و باز در آلمان است که بازی‌های ساده و در دسترس با الهام از فرهنگ ایرانی می‌سازد؛ از کلاسیک‌هایی مثل اسم فامیل، نقطه‌خط و دوز تا دوئل‌های آرکید و روگ‌لایت‌ها. همهٔ بازی‌های بازی مازی با مجوز MIT در github.com/bazimazi متن‌باز هستند.',
+    assets: 'دانلودها',
+    mark: 'نشان (SVG)',
+    mascot: 'شخصیت (SVG)',
+    colours: 'رنگ‌ها',
+    type: 'قلم‌ها',
+    copy: 'کپی',
+    copied: 'کپی شد',
+    contactTitle: 'سلام کن',
+    contactBody: 'سؤال، ایده، رسانه، یا بازی‌ای که فکر می‌کنی باید از نو بسازیم: همه را می‌خوانیم.',
+  },
+}[lang];
+const beliefs = copy.beliefs as { icon: IconName; title: string; text: string }[];
+
+const colours = [
+  { name: lang === 'en' ? 'Lapis night' : 'شب لاجوردی', hex: '#10133A', ink: false },
+  { name: lang === 'en' ? 'Firouzeh' : 'فیروزه', hex: '#20C4B4', ink: true },
+  { name: lang === 'en' ? 'Saffron' : 'زعفران', hex: '#FFB81C', ink: true },
+  { name: lang === 'en' ? 'Mascot orange' : 'نارنجی', hex: '#FF8A1F', ink: true },
+  { name: lang === 'en' ? 'Pomegranate' : 'انار', hex: '#E8434A', ink: false },
+  { name: lang === 'en' ? 'Paper' : 'کاغذ', hex: '#F7F0E3', ink: true },
+];
+const typefaces = [
+  { name: 'Bricolage Grotesque', sample: 'Aa Bb 123', cls: 'latin' },
+  { name: 'Vazirmatn', sample: 'بازی ۱۲۳', cls: 'persian' },
+  { name: 'Lalezar', sample: 'بازی مازی', cls: 'persian-display' },
+];
+const contacts = [
+  { href: `mailto:${SITE.email}`, label: SITE.email, icon: 'mail' },
+  { href: SITE.x, label: '@bazimazi', icon: 'x' },
+  { href: SITE.github, label: 'github.com/bazimazi', icon: 'github' },
+] as const;
+---
+
+<Base lang={lang} title={copy.title} description={copy.description}>
+  <PageHead eyebrow={copy.eyebrow} title={copy.heading} lead={copy.lead} />
+
+  <NameStory lang={lang} />
+
+  <section class="section section--night beliefs">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">{copy.beliefsEyebrow}</p>
+        <h2>{copy.beliefsTitle}</h2>
+      </div>
+      <ul class="beliefs__grid" role="list">
+        {
+          beliefs.map((b, i) => (
+            <li data-reveal style={`--reveal-delay:${(i % 2) * 90}`}>
+              <span class="beliefs__icon">
+                <Icon name={b.icon} size={24} />
+              </span>
+              <div>
+                <h3>{b.title}</h3>
+                <p>{b.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--paper timeline">
+    <Girih />
+    <div class="container timeline__grid">
+      <div class="section-head timeline__head" data-reveal>
+        <p class="eyebrow">{copy.timelineEyebrow}</p>
+        <h2>{copy.timelineTitle}</h2>
+      </div>
+      <ol class="timeline__list" role="list">
+        {
+          copy.timeline.map((item) => (
+            <li data-reveal>
+              <time datetime={created(item.repo)}>{created(item.repo) && formatDate(created(item.repo), lang)}</time>
+              <p>{item.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--deep press" id="press">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">{copy.pressEyebrow}</p>
+        <h2>{copy.pressTitle}</h2>
+        <p>{copy.pressBody}</p>
+      </div>
+
+      <div class="press__grid">
+        <div class="press__card press__boiler" data-reveal>
+          <h3>{copy.boilerplateTitle}</h3>
+          <p id="boilerplate">{copy.boilerplate}</p>
+          <button class="btn btn--ghost press__copy" type="button" data-copy="boilerplate" data-copied={copy.copied}>{copy.copy}</button>
+        </div>
+
+        <div class="press__card press__assets" data-reveal style="--reveal-delay:90">
+          <h3>{copy.assets}</h3>
+          <div class="press__downloads">
+            <a href="/brand/bazimazi-mark.svg" download>
+              <img src="/brand/bazimazi-mark.svg" alt="" width="72" height="72" />
+              <span><Icon name="download" size={16} />{copy.mark}</span>
+            </a>
+            <a href="/brand/bazimazi-mascot.svg" download>
+              <img src="/brand/bazimazi-mascot.svg" alt="" width="72" height="79" />
+              <span><Icon name="download" size={16} />{copy.mascot}</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="press__card press__colours" data-reveal>
+          <h3>{copy.colours}</h3>
+          <ul role="list">
+            {
+              colours.map((c) => (
+                <li>
+                  <button type="button" class="swatch" style={`--c:${c.hex};--t:${c.ink ? '#161a3f' : '#f7f0e3'}`} data-swatch={c.hex} data-copied={copy.copied}>
+                    <span class="swatch__name">{c.name}</span>
+                    <span class="swatch__hex latin">{c.hex}</span>
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="press__card press__type" data-reveal style="--reveal-delay:90">
+          <h3>{copy.type}</h3>
+          <ul role="list">
+            {
+              typefaces.map((f) => (
+                <li>
+                  <span class:list={['press__sample', f.cls]}>{f.sample}</span>
+                  <span class="latin">{f.name}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper contact" id="contact">
+    <div class="container contact__grid">
+      <div class="contact__mascot">
+        <Mascot lang={lang} />
+      </div>
+      <div data-reveal>
+        <h2>{copy.contactTitle}</h2>
+        <p>{copy.contactBody}</p>
+        <ul class="contact__list" role="list">
+          {
+            contacts.map((c) => (
+              <li>
+                <a href={c.href}>
+                  <Icon name={c.icon} size={22} />
+                  <span class="latin">{c.label}</span>
+                  <Icon name="arrow" size={20} class="contact__arrow" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="contact__more"><a class="link-arrow" href={localize('/open-source/', lang)}>{lang === 'en' ? 'How to contribute' : 'چطور مشارکت کنیم'}<Icon name="arrow" /></a></p>
+      </div>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .beliefs__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .beliefs__grid li {
+    display: flex;
+    gap: 22px;
+    padding: 32px;
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  }
+  .beliefs__grid h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  .beliefs__grid p {
+    opacity: 0.75;
+  }
+  .beliefs__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: var(--saffron);
+    color: var(--ink);
+  }
+  .beliefs__grid li:nth-child(2) .beliefs__icon {
+    background: var(--firouzeh);
+  }
+  .beliefs__grid li:nth-child(3) .beliefs__icon {
+    background: var(--rose);
+  }
+  .beliefs__grid li:nth-child(4) .beliefs__icon {
+    background: var(--orange);
+  }
+  @media (max-width: 760px) {
+    .beliefs__grid {
+      grid-template-columns: 1fr;
+    }
+    .beliefs__grid li {
+      flex-direction: column;
+    }
+  }
+
+  .timeline__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 48px;
+  }
+  .timeline__head {
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+    align-self: start;
+  }
+  .timeline__list {
+    position: relative;
+    display: grid;
+    gap: 8px;
+    padding-inline-start: 36px;
+  }
+  .timeline__list::before {
+    content: '';
+    position: absolute;
+    inset-block: 12px;
+    inset-inline-start: 9px;
+    width: 2px;
+    background: linear-gradient(var(--firouzeh), var(--saffron), var(--anar));
+    border-radius: 2px;
+  }
+  .timeline__list li {
+    position: relative;
+    padding: 18px 24px;
+    border-radius: var(--radius);
+    background: var(--paper-2);
+  }
+  .timeline__list li::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    inset-inline-start: -34px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: inset 0 0 0 4px var(--ink);
+  }
+  .timeline__list li:last-child::before {
+    background: var(--saffron);
+  }
+  .timeline__list time {
+    font-weight: 750;
+    font-size: 0.9rem;
+    color: #0c8378;
+  }
+  .timeline__list p {
+    font-size: 1.08rem;
+    margin-top: 2px;
+  }
+  @media (max-width: 860px) {
+    .timeline__grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .timeline__head {
+      position: static;
+    }
+  }
+
+  .press__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .press__card {
+    padding: 32px;
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  }
+  .press__card h3 {
+    font-size: 1.35rem;
+    margin-bottom: 18px;
+  }
+  .press__boiler p {
+    opacity: 0.8;
+    margin-bottom: 22px;
+  }
+  .press__copy {
+    min-height: 44px;
+  }
+  .press__downloads {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .press__downloads a {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    padding: 24px 12px;
+    border-radius: var(--radius-s);
+    background: rgb(255 255 255 / 0.05);
+    text-decoration: none;
+    font-weight: 650;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+  }
+  .press__downloads a:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+  .press__downloads img {
+    height: 72px;
+    width: auto;
+  }
+  .press__downloads span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .press__colours ul {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .swatch {
+    display: grid;
+    align-content: end;
+    justify-items: start;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    padding: 12px 14px;
+    border-radius: var(--radius-s);
+    background: var(--c);
+    color: var(--t);
+    text-align: start;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+    transition: transform 0.3s var(--ease-spring);
+  }
+  .swatch:hover {
+    transform: translateY(-3px);
+  }
+  .swatch__name {
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .swatch__hex {
+    font-size: 0.8rem;
+    opacity: 0.75;
+  }
+  .press__type ul {
+    display: grid;
+    gap: 6px;
+  }
+  .press__type li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  }
+  .press__type li:last-child {
+    border-bottom: 0;
+  }
+  .press__sample {
+    font-size: 2rem;
+    line-height: 1.3;
+  }
+  .press__sample.latin {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .press__sample.persian {
+    font-weight: 700;
+  }
+  .press__type li > span:last-child {
+    opacity: 0.6;
+    font-size: 0.9rem;
+  }
+  @media (max-width: 860px) {
+    .press__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .contact__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+    gap: 56px;
+    align-items: center;
+  }
+  .contact__mascot {
+    width: min(100%, 280px);
+    justify-self: center;
+  }
+  .contact h2 {
+    font-size: clamp(2.6rem, 6vw, 4.5rem);
+  }
+  .contact__grid > div > p {
+    margin-block: 14px 26px;
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+  }
+  .contact__list {
+    display: grid;
+    gap: 10px;
+  }
+  .contact__list a {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    border-radius: var(--radius);
+    background: var(--paper-2);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .contact__list a:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .contact__list :global(.contact__arrow) {
+    margin-inline-start: auto;
+    transition: transform 0.3s var(--ease-spring);
+  }
+  [dir='rtl'] .contact__list :global(.contact__arrow) {
+    transform: scaleX(-1);
+  }
+  .contact__list a:hover :global(.contact__arrow) {
+    transform: translateX(4px);
+  }
+  [dir='rtl'] .contact__list a:hover :global(.contact__arrow) {
+    transform: scaleX(-1) translateX(4px);
+  }
+  .contact__more {
+    margin-top: 20px !important;
+  }
+  @media (max-width: 760px) {
+    .contact__grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .contact__mascot {
+      width: 160px;
+      justify-self: start;
+    }
+  }
+</style>
+
+<script>
+  for (const swatch of document.querySelectorAll<HTMLButtonElement>('[data-swatch]')) {
+    swatch.addEventListener('click', async () => {
+      const hex = swatch.dataset.swatch!;
+      const label = swatch.querySelector('.swatch__hex')!;
+      try {
+        await navigator.clipboard.writeText(hex);
+        label.textContent = swatch.dataset.copied ?? hex;
+        setTimeout(() => (label.textContent = hex), 1400);
+      } catch {
+        /* Clipboard unavailable; the hex code is visible anyway. */
+      }
+    });
+  }
+</script>

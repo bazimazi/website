@@ -1,0 +1,166 @@
+---
+import Girih from './Girih.astro';
+import Icon, { type IconName } from './Icon.astro';
+import Mascot from './Mascot.astro';
+import { SITE } from '~/config';
+import type { Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const copy = {
+  en: {
+    eyebrow: 'Join in',
+    title: 'Pull up a chair.',
+    body: 'bazimazi is an open organization. Anyone can play, read, fork or improve what we make. No forms, no gatekeepers. Pick a game and say hello.',
+    ways: [
+      { icon: 'bug', title: 'Play and report', text: 'Found a bug or a rough edge? Open an issue. Screenshots welcome.' },
+      { icon: 'translate', title: 'Translate', text: 'Our games speak Persian and English. Yours could be next.' },
+      { icon: 'brush', title: 'Design', text: 'Skins, icons, sounds, a new board theme. Art is half of every game.' },
+      { icon: 'cpu', title: 'Build', text: 'A feature, a test, or a bot that finally beats ours.' },
+    ],
+    github: 'Find a game on GitHub',
+    x: 'Follow @bazimazi',
+    email: 'Email us',
+  },
+  fa: {
+    eyebrow: 'همراه شو',
+    title: 'بیا، جا هست.',
+    body: 'بازی مازی یک سازمان باز است. هر کسی می‌تواند بازی‌هایمان را بازی کند، کدشان را بخواند، فورک کند یا بهترشان کند. بدون فرم، بدون دربان. یک بازی انتخاب کن و سلام کن.',
+    ways: [
+      { icon: 'bug', title: 'بازی کن و گزارش بده', text: 'باگ یا گوشهٔ ناصافی پیدا کردی؟ یک issue باز کن. اسکرین‌شات هم خوش‌آمد است.' },
+      { icon: 'translate', title: 'ترجمه کن', text: 'بازی‌هایمان فارسی و انگلیسی حرف می‌زنند. زبان بعدی می‌تواند زبان تو باشد.' },
+      { icon: 'brush', title: 'طراحی کن', text: 'پوسته، آیکون، صدا، یک تم تازه. نیمی از هر بازی هنر است.' },
+      { icon: 'cpu', title: 'بساز', text: 'یک قابلیت، یک تست، یا رباتی که بالاخره ربات ما را شکست بدهد.' },
+    ],
+    github: 'یک بازی در گیت‌هاب پیدا کن',
+    x: 'دنبال کردن ‎@bazimazi',
+    email: 'ایمیل بزن',
+  },
+}[lang] as {
+  eyebrow: string;
+  title: string;
+  body: string;
+  ways: { icon: IconName; title: string; text: string }[];
+  github: string;
+  x: string;
+  email: string;
+};
+---
+
+<section class="section section--deep join" id="join">
+  <Girih size={160} />
+  <div class="container join__grid">
+    <div class="join__copy">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2 class="join__title">{copy.title}</h2>
+      <p class="join__body">{copy.body}</p>
+      <div class="btn-row">
+        <a class="btn" href={SITE.github}><Icon name="github" />{copy.github}</a>
+        <a class="btn btn--ghost" href={SITE.x}><Icon name="x" />{copy.x}</a>
+        <a class="btn btn--ghost" href={`mailto:${SITE.email}`}><Icon name="mail" />{copy.email}</a>
+      </div>
+    </div>
+    <div class="join__mascot">
+      <Mascot lang={lang} />
+    </div>
+    <ul class="join__ways" role="list">
+      {
+        copy.ways.map((w, i) => (
+          <li data-reveal style={`--reveal-delay:${i * 80}`}>
+            <span class="join__icon">
+              <Icon name={w.icon} size={22} />
+            </span>
+            <h3>{w.title}</h3>
+            <p>{w.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .join {
+    overflow: hidden;
+  }
+  .join__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+    gap: 40px 60px;
+    align-items: center;
+  }
+  .join__title {
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    margin-block: 18px 22px;
+  }
+  .join__body {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    max-width: 52ch;
+    margin-bottom: 32px;
+  }
+  .join__mascot {
+    width: min(100%, 300px);
+    justify-self: center;
+  }
+  .join__ways {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 40px;
+  }
+  .join__ways li {
+    padding: 26px;
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  }
+  .join__ways h3 {
+    font-size: 1.35rem;
+    margin-block: 18px 8px;
+  }
+  .join__ways p {
+    opacity: 0.7;
+    font-size: 0.98rem;
+  }
+  .join__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: var(--firouzeh);
+    color: var(--ink);
+  }
+  .join__ways li:nth-child(2) .join__icon {
+    background: var(--saffron);
+  }
+  .join__ways li:nth-child(3) .join__icon {
+    background: var(--rose);
+  }
+  .join__ways li:nth-child(4) .join__icon {
+    background: var(--orange);
+  }
+  @media (max-width: 1000px) {
+    .join__ways {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .join__grid {
+      grid-template-columns: 1fr;
+    }
+    .join__mascot {
+      grid-row: 1;
+      width: 160px;
+      justify-self: start;
+    }
+    .join__ways {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

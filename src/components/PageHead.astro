@@ -1,0 +1,90 @@
+---
+import Girih from './Girih.astro';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+}
+
+const { eyebrow, title, lead } = Astro.props;
+---
+
+<header class="page-head">
+  <Girih size={140} />
+  <div class="page-head__orb" aria-hidden="true"></div>
+  <div class="container page-head__inner">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {lead && <p class="page-head__lead">{lead}</p>}
+    <slot />
+  </div>
+</header>
+
+<style>
+  .page-head {
+    position: relative;
+    padding-block: calc(var(--header-h) + clamp(56px, 9vw, 120px)) clamp(64px, 8vw, 104px);
+    background:
+      radial-gradient(900px 500px at 90% 0%, #232a78 0%, transparent 60%),
+      radial-gradient(700px 400px at 0% 100%, #0f4a5a 0%, transparent 60%),
+      var(--night-900);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .page-head :global(.girih-bg) {
+    opacity: 0.06;
+    mask-image: linear-gradient(to bottom, #000, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+  }
+  .page-head__orb {
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    inset-inline-end: 8%;
+    top: 32%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffd27a, var(--orange) 55%, #c95400);
+    box-shadow: 0 30px 80px -10px rgb(255 138 31 / 0.5);
+    z-index: -1;
+    opacity: 0.9;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .page-head__orb {
+      animation: orb-bounce 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+  }
+  @keyframes orb-bounce {
+    from {
+      transform: translateY(-30px);
+    }
+    to {
+      transform: translateY(30px) scale(1.04, 0.96);
+    }
+  }
+  .page-head__inner {
+    display: grid;
+    gap: 22px;
+  }
+  .page-head h1 {
+    font-size: clamp(2.8rem, 7.4vw, 6.4rem);
+    max-width: 14ch;
+  }
+  :lang(fa) .page-head h1 {
+    max-width: 18ch;
+  }
+  .page-head__lead {
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    max-width: 58ch;
+    opacity: 0.8;
+  }
+  @media (max-width: 760px) {
+    .page-head__orb {
+      width: 110px;
+      height: 110px;
+      top: auto;
+      bottom: 24px;
+      opacity: 0.6;
+    }
+  }
+</style>

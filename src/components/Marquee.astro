@@ -1,0 +1,82 @@
+---
+import { games } from '~/data/games';
+
+const items = games.flatMap((g) => (g.native ? [{ text: g.name.en, fa: false }, { text: g.native, fa: true }] : [{ text: g.name.en, fa: false }]));
+// Repeat so the track is always wider than the screen; the second copy makes the loop seamless.
+const track = [...items, ...items];
+---
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    {
+      [0, 1].map(() => (
+        <ul class="marquee__group" role="list">
+          {track.map((item) => (
+            <li>
+              <span class={item.fa ? 'persian-display' : undefined}>{item.text}</span>
+              <svg viewBox="0 0 24 24" class="marquee__star">
+                <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3Z" />
+              </svg>
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .marquee {
+    position: relative;
+    z-index: 2;
+    margin-block: -36px;
+    padding-block: 18px;
+    background: var(--saffron);
+    color: var(--ink);
+    transform: rotate(-2deg);
+    box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.5);
+    overflow: hidden;
+    direction: ltr;
+    width: 104%;
+    margin-inline: -2%;
+  }
+  .marquee__track {
+    display: flex;
+    width: max-content;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .marquee__track {
+      animation: marquee 60s linear infinite;
+    }
+  }
+  .marquee__group {
+    display: flex;
+    flex: none;
+  }
+  .marquee li {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding-inline-end: 28px;
+    font-family: 'Bricolage Grotesque Variable', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  .marquee .persian-display {
+    font-weight: 400;
+  }
+  .marquee__star {
+    width: 22px;
+    height: 22px;
+    fill: var(--anar);
+    flex: none;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>

@@ -1,0 +1,434 @@
+---
+import Girih from '~/components/Girih.astro';
+import Icon from '~/components/Icon.astro';
+import JoinCta from '~/components/JoinCta.astro';
+import PageHead from '~/components/PageHead.astro';
+import Partyframe from '~/components/Partyframe.astro';
+import Base from '~/layouts/Base.astro';
+import { SITE } from '~/config';
+import { games } from '~/data/games';
+import { experiments } from '~/data/lab';
+import { getActivity, getOrgStats } from '~/data/github';
+import { formatDate, num, t, type Lang } from '~/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ui = t(lang);
+const repos = await getActivity();
+const stats = await getOrgStats();
+const languages = Object.entries(
+  repos.reduce<Record<string, number>>((acc, r) => {
+    if (r.language) acc[r.language] = (acc[r.language] ?? 0) + 1;
+    return acc;
+  }, {}),
+).sort((a, b) => b[1] - a[1]);
+
+// Localised one-liners for repositories we describe elsewhere on the site.
+const blurbs = new Map<string, string>([
+  ...games.map((g) => [g.repo, g.tagline[lang]] as [string, string]),
+  ...experiments.map((e) => [e.repo, e.line[lang]] as [string, string]),
+]);
+
+const copy = {
+  en: {
+    title: 'Open source',
+    description: 'Every bazimazi game, tool and experiment is open source under the MIT license. Learn how to run them, contribute, and build party games with partyframe.',
+    eyebrow: `${num(stats.repos, lang)} public repositories · MIT`,
+    heading: 'Built in the open.',
+    lead: 'Every game, tool and experiment we make is public on GitHub under the MIT license. Here is how it fits together, and how to jump in.',
+    stepsEyebrow: 'Contributing',
+    stepsTitle: 'From curious to contributor in four steps.',
+    steps: [
+      { title: 'Pick a game', text: 'Browse the games or the lab. Every repository has a README that gets you running in a few commands.' },
+      { title: 'Run it', text: 'Clone, install, play. Most of our games are one npm run dev away.' },
+      { title: 'Find something', text: 'An open issue, a rough edge, a missing translation, a bot that is too easy. Or bring your own idea.' },
+      { title: 'Open a pull request', text: 'Small and focused is best. Reviews happen in the open, like everything else.' },
+    ],
+    toolsEyebrow: 'Our toolbox',
+    toolsTitle: 'Web technology, everywhere.',
+    toolsBody: 'We build on the open web first, then wrap the same code for desktop and mobile. Fewer codebases, more games.',
+    reposTitle: 'Every repository',
+    search: 'Filter repositories',
+    searchPlaceholder: 'Search by name, language or idea…',
+    empty: 'Nothing matches that. Maybe it is your next repository?',
+    repoCount: (n: number) => `${n} repositories`,
+  },
+  fa: {
+    title: 'متن‌باز',
+    description: 'همهٔ بازی‌ها، ابزارها و آزمایش‌های بازی مازی با مجوز MIT متن‌بازند. ببینید چطور اجرایشان کنید، مشارکت کنید و با partyframe بازی گروهی بسازید.',
+    eyebrow: `${num(stats.repos, lang)} مخزن عمومی · MIT`,
+    heading: 'ساخته‌شده در فضای باز.',
+    lead: 'هر بازی، ابزار و آزمایشی که می‌سازیم با مجوز MIT در گیت‌هاب عمومی است. اینجا می‌بینی همه‌چیز چطور کنار هم قرار گرفته و چطور می‌توانی وارد شوی.',
+    stepsEyebrow: 'مشارکت',
+    stepsTitle: 'از کنجکاوی تا مشارکت، در چهار قدم.',
+    steps: [
+      { title: 'یک بازی انتخاب کن', text: 'بازی‌ها یا آزمایشگاه را بگرد. هر مخزن یک README دارد که با چند دستور راهت می‌اندازد.' },
+      { title: 'اجرایش کن', text: 'کلون کن، نصب کن، بازی کن. بیشتر بازی‌هایمان فقط یک npm run dev فاصله دارند.' },
+      { title: 'چیزی پیدا کن', text: 'یک issue باز، یک گوشهٔ ناصاف، یک ترجمهٔ جاافتاده، رباتی که زیادی آسان است. یا ایدهٔ خودت را بیاور.' },
+      { title: 'یک pull request بفرست', text: 'کوچک و متمرکز بهتر است. بازبینی هم مثل همه‌چیز دیگر در فضای باز انجام می‌شود.' },
+    ],
+    toolsEyebrow: 'جعبه‌ابزار ما',
+    toolsTitle: 'فناوری وب، همه‌جا.',
+    toolsBody: 'اول روی وبِ باز می‌سازیم، بعد همان کد را برای دسکتاپ و موبایل بسته‌بندی می‌کنیم. کد کمتر، بازی بیشتر.',
+    reposTitle: 'همهٔ مخزن‌ها',
+    search: 'فیلتر مخزن‌ها',
+    searchPlaceholder: 'جست‌وجو با نام، زبان یا ایده…',
+    empty: 'چیزی پیدا نشد. شاید مخزن بعدی مال تو باشد؟',
+    repoCount: (n: number) => `${num(n, lang)} مخزن`,
+  },
+}[lang];
+
+const tools = [
+  'TypeScript',
+  'React',
+  'Vite',
+  'Canvas 2D',
+  'WebGL2',
+  'WebAudio',
+  'PWA',
+  'Tauri',
+  'Capacitor',
+  'Socket.IO',
+  'Hono',
+  'Fastify',
+  'SQLite',
+  'Matter.js',
+  'Vitest',
+  'Playwright',
+  'Godot',
+  'C#',
+];
+---
+
+<Base lang={lang} title={copy.title} description={copy.description}>
+  <PageHead eyebrow={copy.eyebrow} title={copy.heading} lead={copy.lead}>
+    <div class="btn-row">
+      <a class="btn" href={SITE.github}><Icon name="github" />{ui.github}</a>
+      <a class="btn btn--ghost" href={SITE.npm}><Icon name="npm" />npm</a>
+    </div>
+  </PageHead>
+
+  <section class="section section--paper">
+    <Girih />
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">{copy.stepsEyebrow}</p>
+        <h2>{copy.stepsTitle}</h2>
+      </div>
+      <ol class="steps" role="list">
+        {
+          copy.steps.map((step, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 90}`}>
+              <span class="steps__num">{num(i + 1, lang)}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--night tools">
+    <div class="container tools__grid">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">{copy.toolsEyebrow}</p>
+        <h2>{copy.toolsTitle}</h2>
+        <p>{copy.toolsBody}</p>
+        <ul class="tools__langs" role="list">
+          {
+            languages.map(([language, count]) => (
+              <li>
+                <b class="latin">{language}</b>
+                <span>{copy.repoCount(count)}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <ul class="tools__chips" role="list" data-reveal style="--reveal-delay:120">
+        {tools.map((tool) => <li class="latin">{tool}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--deep" id="partyframe">
+    <div class="container">
+      <Partyframe lang={lang} />
+    </div>
+  </section>
+
+  <section class="section section--paper repos" id="repositories">
+    <Girih />
+    <div class="container">
+      <div class="repos__head">
+        <h2>{copy.reposTitle}</h2>
+        <label class="repos__search">
+          <span class="sr-only">{copy.search}</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input type="search" placeholder={copy.searchPlaceholder} data-repo-search />
+        </label>
+      </div>
+      <ul class="repos__list" role="list" data-repo-list>
+        {
+          repos.map((repo) => {
+            const blurb = blurbs.get(repo.name) ?? repo.description ?? '';
+            return (
+              <li data-search={`${repo.name} ${repo.language ?? ''} ${blurb} ${repo.description ?? ''}`.toLowerCase()}>
+                <a href={repo.url}>
+                  <span class="repos__name latin">{repo.name}</span>
+                  <span class="repos__desc">{blurb}</span>
+                  <span class="repos__lang latin">{repo.language}</span>
+                  <time datetime={repo.pushedAt} data-relative>
+                    {formatDate(repo.pushedAt, lang, { day: 'numeric', month: 'short' })}
+                  </time>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+      <p class="repos__empty" hidden data-repo-empty>{copy.empty}</p>
+    </div>
+  </section>
+
+  <JoinCta lang={lang} />
+</Base>
+
+<style>
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    counter-reset: step;
+  }
+  .steps li {
+    position: relative;
+    padding: 28px;
+    border-radius: var(--radius);
+    background: var(--paper-2);
+  }
+  .steps h3 {
+    font-size: 1.45rem;
+    margin-block: 18px 10px;
+  }
+  .steps p {
+    color: var(--ink-soft);
+  }
+  .steps__num {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--saffron);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+  .steps li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 53px;
+    inset-inline-end: -14px;
+    width: 12px;
+    height: 2px;
+    background: var(--paper-3);
+  }
+  @media (max-width: 1000px) {
+    .steps {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .steps li::after {
+      display: none;
+    }
+  }
+  @media (max-width: 600px) {
+    .steps {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .tools__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: center;
+  }
+  .tools__grid .section-head {
+    margin-bottom: 0;
+  }
+  .tools__langs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 12px;
+  }
+  .tools__langs li {
+    display: grid;
+  }
+  .tools__langs b {
+    font-size: 1.3rem;
+  }
+  .tools__langs span {
+    font-size: 0.9rem;
+    opacity: 0.6;
+  }
+  .tools__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .tools__chips li {
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.06);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+    font-weight: 650;
+    transition:
+      transform 0.3s var(--ease-spring),
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .tools__chips li:nth-child(4n + 1):hover {
+    background: var(--firouzeh);
+  }
+  .tools__chips li:nth-child(4n + 2):hover {
+    background: var(--saffron);
+  }
+  .tools__chips li:nth-child(4n + 3):hover {
+    background: var(--anar);
+  }
+  .tools__chips li:nth-child(4n):hover {
+    background: var(--orange);
+  }
+  .tools__chips li:hover {
+    color: var(--ink);
+    transform: translateY(-4px) rotate(-3deg);
+  }
+  @media (max-width: 900px) {
+    .tools__grid {
+      grid-template-columns: 1fr;
+    }
+    .tools__chips {
+      justify-content: flex-start;
+    }
+  }
+
+  .repos__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .repos__head h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+  .repos__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(100%, 380px);
+    padding: 0 18px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1.5px var(--paper-3);
+    transition: box-shadow 0.2s;
+  }
+  .repos__search:focus-within {
+    box-shadow: inset 0 0 0 2px var(--ink);
+  }
+  .repos__search input {
+    flex: 1;
+    min-width: 0;
+    height: 50px;
+    border: 0;
+    background: none;
+    outline: none;
+  }
+  .repos__list {
+    border-radius: var(--radius);
+    background: #fff;
+    box-shadow: 0 1px 0 var(--paper-3);
+    overflow: hidden;
+  }
+  .repos__list a {
+    display: grid;
+    grid-template-columns: minmax(150px, 1fr) minmax(0, 2.4fr) 110px 120px;
+    gap: 20px;
+    align-items: center;
+    padding: 16px 24px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--paper-2);
+    transition: background-color 0.15s;
+  }
+  .repos__list li:last-child a {
+    border-bottom: 0;
+  }
+  .repos__list a:hover {
+    background: var(--paper);
+  }
+  .repos__list li[hidden] {
+    display: none;
+  }
+  .repos__name {
+    font-weight: 750;
+  }
+  .repos__desc {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .repos__lang,
+  .repos__list time {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  .repos__list time {
+    text-align: end;
+  }
+  .repos__empty {
+    padding: 28px;
+    text-align: center;
+    color: var(--ink-soft);
+  }
+  @media (max-width: 760px) {
+    .repos__list a {
+      grid-template-columns: 1fr auto;
+      gap: 4px 12px;
+    }
+    .repos__desc {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      white-space: normal;
+    }
+    .repos__lang {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('[data-repo-search]');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-repo-list] > li')];
+  const empty = document.querySelector<HTMLElement>('[data-repo-empty]');
+  input?.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    let shown = 0;
+    for (const item of items) {
+      const match = !q || item.dataset.search!.includes(q);
+      item.hidden = !match;
+      if (match) shown++;
+    }
+    if (empty) empty.hidden = shown > 0;
+  });
+</script>

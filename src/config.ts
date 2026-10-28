@@ -11,3 +11,6 @@ export const SITE = {
 } as const;
 
 export const repoUrl = (repo: string) => `${SITE.github}/${repo}`;
+
+/** A web game published as a standalone app on its own subdomain. */
+export const playAt = (subdomain: string) => `https://${subdomain}.bazimazi.games/`;

@@ -22,18 +22,21 @@ const list = experiments
   .map((e, i) => ({ ...e, data: repos.find((r) => r.name === e.repo), i }));
 const viewSource = lang === 'en' ? 'Source on GitHub' : 'کد در گیت‌هاب';
 const grownUp = lang === 'en' ? 'Now a game' : 'حالا یک بازی';
+const playIt = lang === 'en' ? 'Play' : 'بازی کن';
 ---
 
 <ul class="lab-grid" role="list">
   {
     list.map((e) => (
-      <li class:list={['lab-card', { 'lab-card--grown': e.graduated }]} data-reveal style={`--reveal-delay:${(e.i % 4) * 70}`} data-lab-card>
+      <li class:list={['lab-card', { 'lab-card--grown': e.graduated, 'lab-card--play': !e.graduated && e.play }]} data-reveal style={`--reveal-delay:${(e.i % 4) * 70}`} data-lab-card>
         <div class="lab-card__glyph">
           <LabGlyph glyph={e.glyph} />
         </div>
         <h3 class="lab-card__name latin">
           {e.graduated ? (
             <a href={localize(`/games/${e.graduated}/`, lang)}>{e.name}</a>
+          ) : e.play ? (
+            <a href={e.play}>{e.name}</a>
           ) : (
             <a href={repoUrl(e.repo)}>
               {e.name}
@@ -49,7 +52,16 @@ const grownUp = lang === 'en' ? 'Now a game' : 'حالا یک بازی';
               {formatDate(e.data.pushedAt, lang, { day: 'numeric', month: 'short' })}
             </time>
           )}
-          {e.graduated ? <span class="lab-card__badge">{grownUp}</span> : <Icon name="external" size={15} class="lab-card__ext" />}
+          {e.graduated ? (
+            <span class="lab-card__badge">{grownUp}</span>
+          ) : e.play ? (
+            <span class="lab-card__badge lab-card__badge--play">
+              <Icon name="play" size={13} />
+              {playIt}
+            </span>
+          ) : (
+            <Icon name="external" size={15} class="lab-card__ext" />
+          )}
         </p>
       </li>
     ))
@@ -144,10 +156,12 @@ const grownUp = lang === 'en' ? 'Now a game' : 'حالا یک بازی';
     background: rgb(255 184 28 / 0.08);
     box-shadow: inset 0 0 0 1px rgb(255 184 28 / 0.3);
   }
-  .lab-card--grown .lab-card__meta {
+  .lab-card--grown .lab-card__meta,
+  .lab-card--play .lab-card__meta {
     opacity: 1;
   }
-  .lab-card--grown .lab-card__meta > :not(.lab-card__badge) {
+  .lab-card--grown .lab-card__meta > :not(.lab-card__badge),
+  .lab-card--play .lab-card__meta > :not(.lab-card__badge) {
     opacity: 0.5;
   }
   .lab-card__badge {
@@ -156,6 +170,15 @@ const grownUp = lang === 'en' ? 'Now a game' : 'حالا یک بازی';
     background: var(--saffron);
     color: var(--ink);
     font-weight: 700;
+  }
+  .lab-card__badge--play {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--firouzeh);
+  }
+  .lab-card--play {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--firouzeh) 35%, transparent);
   }
   .lab-card--cta {
     justify-content: center;

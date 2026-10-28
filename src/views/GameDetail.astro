@@ -25,6 +25,7 @@ const otherName = lang === 'en' ? game.native : game.name.en !== game.name.fa ? 
 const copy = {
   en: {
     games: 'Games',
+    play: 'Play now',
     run: 'Run it locally',
     runTitle: 'Play it tonight.',
     runBody: 'Our games are played from source while they grow. You need Git, Node.js and npm. The README covers everything else, from tests to desktop and mobile builds.',
@@ -40,6 +41,7 @@ const copy = {
   },
   fa: {
     games: 'بازی‌ها',
+    play: 'همین حالا بازی کن',
     run: 'اجرای محلی',
     runTitle: 'همین امشب بازی‌اش کن.',
     runBody: 'بازی‌هایمان تا وقتی در حال رشدند از روی کد اجرا می‌شوند. به Git، Node.js و npm نیاز داری. بقیه‌اش، از تست‌ها تا ساخت نسخهٔ دسکتاپ و موبایل، در README آمده است.',
@@ -96,8 +98,19 @@ const schema = {
         <p class="detail-hero__tagline">{game.tagline[lang]}</p>
         <p class="detail-hero__summary">{game.summary[lang]}</p>
         <div class="btn-row">
-          <a class="btn" href={repoUrl(game.repo)}><Icon name="github" />{ui.viewSource}</a>
-          <a class="btn btn--ghost" href="#run"><Icon name="play" />{copy.run}</a>
+          {
+            game.play ? (
+              <>
+                <a class="btn" href={game.play}><Icon name="play" />{copy.play}</a>
+                <a class="btn btn--ghost" href={repoUrl(game.repo)}><Icon name="github" />{ui.viewSource}</a>
+              </>
+            ) : (
+              <>
+                <a class="btn" href={repoUrl(game.repo)}><Icon name="github" />{ui.viewSource}</a>
+                <a class="btn btn--ghost" href="#run"><Icon name="play" />{copy.run}</a>
+              </>
+            )
+          }
         </div>
       </div>
       <div class="detail-hero__art" data-tilt-art>

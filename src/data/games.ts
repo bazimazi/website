@@ -1,3 +1,4 @@
+import { playAt } from '~/config';
 import type { L } from '~/i18n';
 
 export type Status = 'playable' | 'prototype';
@@ -21,6 +22,8 @@ export interface Game {
   stack: string[];
   /** Shell commands to run the game from source. */
   run: string;
+  /** Where the game is played in the browser, as a standalone app on its own subdomain. */
+  play?: string;
   /** Card colours: background, foreground and accent. */
   theme: { bg: string; fg: string; accent: string };
   screenshot?: { src: string; width: number; height: number; alt: L };
@@ -121,6 +124,7 @@ export const games: Game[] = [
     platforms: ['web', 'pwa'],
     stack: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'WebSockets'],
     run: clone('noqat'),
+    play: playAt('noqat'),
     theme: { bg: '#0F5C63', fg: '#F7F0E3', accent: '#F2C14E' },
   },
   {
@@ -163,6 +167,7 @@ export const games: Game[] = [
     platforms: ['web', 'pwa', 'desktop', 'android', 'ios'],
     stack: ['TypeScript', 'React 19', 'Vite 8', 'Tailwind CSS 4', 'Tauri 2', 'Hono'],
     run: clone('dooz', 'dooz/src'),
+    play: playAt('dooz'),
     theme: { bg: '#1B2163', fg: '#F7F0E3', accent: '#FF8A1F' },
   },
   {
@@ -195,6 +200,7 @@ export const games: Game[] = [
     platforms: ['web', 'pwa', 'android', 'ios'],
     stack: ['React 19', 'TypeScript', 'Vite', 'Capacitor 8', 'Playwright'],
     run: clone('spy'),
+    play: playAt('spy'),
     theme: { bg: '#17122B', fg: '#F7F0E3', accent: '#FF6B3D' },
   },
   {
@@ -226,6 +232,7 @@ export const games: Game[] = [
     platforms: ['web', 'desktop'],
     stack: ['React', 'TypeScript', 'Vite', 'Canvas', 'Tauri'],
     run: clone('bBall'),
+    play: playAt('bball'),
     theme: { bg: '#05070F', fg: '#F7F0E3', accent: '#3FF1E0' },
     screenshot: {
       src: '/images/games/bball.webp',
@@ -266,6 +273,7 @@ export const games: Game[] = [
     platforms: ['web', 'desktop', 'android', 'ios'],
     stack: ['TypeScript', 'Vite', 'Canvas 2D', 'WebAudio', 'Tauri 2'],
     run: clone('BounceDefense'),
+    play: playAt('bounce-defense'),
     theme: { bg: '#2A0E2E', fg: '#F7F0E3', accent: '#FFB81C' },
   },
   {
@@ -297,6 +305,7 @@ export const games: Game[] = [
     platforms: ['web'],
     stack: ['TypeScript', 'Vite', 'Canvas', 'Playwright'],
     run: clone('PachinkoRoguelite'),
+    play: playAt('plumb'),
     theme: { bg: '#3B2412', fg: '#F7F0E3', accent: '#F5C35B' },
   },
   {
@@ -328,6 +337,7 @@ export const games: Game[] = [
     platforms: ['web', 'pwa'],
     stack: ['TypeScript', 'WebGL2', 'Vite', 'PWA'],
     run: clone('soulforge'),
+    play: playAt('soulforge'),
     theme: { bg: '#120A1C', fg: '#F7F0E3', accent: '#FF7A3D' },
   },
 ];

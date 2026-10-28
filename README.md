@@ -20,7 +20,7 @@ npm run preview    # serve dist/
 
 ```
 src/
-├── config.ts            site URL, social links, contact email
+├── config.ts            site URL, social links, contact email, game subdomains
 ├── i18n/index.ts        locales, shared UI strings, Persian digits and dates
 ├── data/
 │   ├── games.ts         the game catalogue (copy in both languages, platforms, stack, colours)
@@ -41,10 +41,15 @@ Each page's copy sits next to its markup, in an `{ en, fa }` object at the top o
 1. Add an entry to `src/data/games.ts`. The `slug` becomes `/games/<slug>/` and `/fa/games/<slug>/`.
 2. Draw its cover in `src/components/GameArt.astro` (a branch keyed by the slug).
 3. If it started in the Lab, set `graduated: '<slug>'` on its entry in `src/data/lab.ts`.
+4. If it is published as a web app, set `play: playAt('<subdomain>')`. The game page then leads with a **Play now** button.
+
+## Games on subdomains
+
+Each web game is built and deployed from its own repository and served as a standalone app at `https://<subdomain>.bazimazi.games`. Its source never enters this project. The game's `.github/workflows/deploy.yml` builds it and uploads `dist/` to `/var/www/games/<subdomain>/` on the server, where one nginx block serves every subdomain. See the `spy` repository for a working example.
 
 ### Adding an experiment
 
-Add an entry to `src/data/lab.ts` and pick a `glyph`, the small animated illustration drawn by `src/components/LabGlyph.astro`.
+Add an entry to `src/data/lab.ts` and pick a `glyph`, the small animated illustration drawn by `src/components/LabGlyph.astro`. If it is published as a web app, set `play: playAt('<subdomain>')` so its card opens the game instead of the repository.
 
 ## Repository data
 

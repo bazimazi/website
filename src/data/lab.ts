@@ -1,3 +1,4 @@
+import { playAt } from '~/config';
 import type { L } from '~/i18n';
 
 /** The animated glyph that illustrates an experiment's core mechanic. */
@@ -30,6 +31,8 @@ export interface Experiment {
   series: 'bounce' | 'worlds';
   /** Slug of the game this experiment grew into. */
   graduated?: string;
+  /** Where the experiment is played in the browser, as a standalone app on its own subdomain. */
+  play?: string;
 }
 
 export const experiments: Experiment[] = [
@@ -39,6 +42,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Bouncing is the combat system.', fa: 'جهیدن، خودِ سیستم نبرد است.' },
     glyph: 'combat',
     series: 'bounce',
+    play: playAt('bounce-bound'),
   },
   {
     repo: 'Ballborn',
@@ -46,6 +50,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Build a ball. Feel it. Break it. Rebuild it.', fa: 'یک توپ بساز، حسش کن، بشکنش، دوباره بسازش.' },
     glyph: 'build',
     series: 'bounce',
+    play: playAt('ballborn'),
   },
   {
     repo: 'BounceArchitect',
@@ -53,6 +58,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Don’t steer the ball. Engineer the world around it.', fa: 'توپ را هدایت نکن؛ دنیای اطرافش را مهندسی کن.' },
     glyph: 'ramp',
     series: 'bounce',
+    play: playAt('bounce-architect'),
   },
   {
     repo: 'Gravityball',
@@ -60,6 +66,7 @@ export const experiments: Experiment[] = [
     line: { en: 'You don’t move the ball. You turn gravity.', fa: 'توپ را حرکت نمی‌دهی؛ جاذبه را می‌چرخانی.' },
     glyph: 'gravity',
     series: 'bounce',
+    play: playAt('gravityball'),
   },
   {
     repo: 'BounceArena',
@@ -67,6 +74,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Speed is power. Spend it on a hit, or on staying alive.', fa: 'سرعت یعنی قدرت؛ خرج ضربه کن، یا خرج زنده ماندن.' },
     glyph: 'arena',
     series: 'bounce',
+    play: playAt('bounce-arena'),
   },
   {
     repo: 'InfiniteBounce',
@@ -74,6 +82,7 @@ export const experiments: Experiment[] = [
     line: { en: 'An endless runner where you are the ball.', fa: 'یک دوندهٔ بی‌پایان که در آن خودت توپی.' },
     glyph: 'runner',
     series: 'bounce',
+    play: playAt('infinite-bounce'),
   },
   {
     repo: 'PachinkoRoguelite',
@@ -89,6 +98,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Plan a machine. Press play. See if the plan was true.', fa: 'ماشینی طراحی کن، اجرا را بزن، ببین نقشه درست بود یا نه.' },
     glyph: 'logic',
     series: 'bounce',
+    play: playAt('bounce-logic'),
   },
   {
     repo: 'MagnetBall',
@@ -96,6 +106,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Flip the poles. Keep the momentum.', fa: 'قطب را برگردان، تکانه را نگه دار.' },
     glyph: 'magnet',
     series: 'bounce',
+    play: playAt('magnet-ball'),
   },
   {
     repo: 'Bounceback',
@@ -103,6 +114,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Every few seconds, time rewinds.', fa: 'هر چند ثانیه، زمان به عقب برمی‌گردد.' },
     glyph: 'rewind',
     series: 'bounce',
+    play: playAt('bounceback'),
   },
   {
     repo: 'PlanetBounce',
@@ -110,6 +122,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Slingshot between tiny planets on momentum alone.', fa: 'فقط با تکانه، از سیاره‌ای کوچک به سیارهٔ دیگر بپر.' },
     glyph: 'orbit',
     series: 'bounce',
+    play: playAt('planet-bounce'),
   },
   {
     repo: 'BounceDefense',
@@ -125,6 +138,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Every collision changes the ball.', fa: 'هر برخورد، توپ را دگرگون می‌کند.' },
     glyph: 'alchemy',
     series: 'bounce',
+    play: playAt('alchemy-ball'),
   },
   {
     repo: 'GhostBounce',
@@ -132,6 +146,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Every failed attempt becomes a ghost teammate.', fa: 'هر تلاش ناموفق، یک هم‌تیمیِ شبح می‌شود.' },
     glyph: 'ghost',
     series: 'bounce',
+    play: playAt('ghost-bounce'),
   },
   {
     repo: 'FluidBall',
@@ -139,6 +154,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Swim in water. Fall upward in lava. Float in the void.', fa: 'در آب شنا کن، در گدازه رو به بالا بیفت، در خلأ شناور شو.' },
     glyph: 'fluid',
     series: 'bounce',
+    play: playAt('fluid-ball'),
   },
   {
     repo: 'Lifeform',
@@ -146,6 +162,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Build a living creature. Leave a lineage.', fa: 'یک موجود زنده بساز. نسلی به جا بگذار.' },
     glyph: 'cell',
     series: 'worlds',
+    play: playAt('lifeform'),
   },
   {
     repo: 'Gravityborn',
@@ -153,6 +170,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Turn the entire room into a weapon.', fa: 'کل اتاق را به سلاح تبدیل کن.' },
     glyph: 'gravity',
     series: 'worlds',
+    play: playAt('gravityborn'),
   },
   {
     repo: 'DungeonArchitect',
@@ -160,6 +178,7 @@ export const experiments: Experiment[] = [
     line: { en: 'You are not the hero. You are the dungeon’s architect.', fa: 'تو قهرمان نیستی؛ معمار سیاه‌چالی.' },
     glyph: 'dungeon',
     series: 'worlds',
+    play: playAt('dungeon-architect'),
   },
   {
     repo: 'AlchemyWars',
@@ -167,6 +186,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Collect elements, not heroes. Watch the reactions fight.', fa: 'عنصر جمع کن، نه قهرمان. نبرد واکنش‌ها را تماشا کن.' },
     glyph: 'alchemy',
     series: 'worlds',
+    play: playAt('alchemy-wars'),
   },
   {
     repo: 'Echo',
@@ -181,6 +201,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Begin with one tiny planet. End with another Big Bang.', fa: 'با یک سیارهٔ کوچک شروع کن؛ با مه‌بانگی دیگر تمام کن.' },
     glyph: 'orbit',
     series: 'worlds',
+    play: playAt('tiny-universe'),
   },
   {
     repo: 'MonsterWorkshop',
@@ -188,6 +209,7 @@ export const experiments: Experiment[] = [
     line: { en: 'Build creatures that could never exist in nature.', fa: 'موجوداتی بساز که هرگز در طبیعت وجود نداشته‌اند.' },
     glyph: 'cell',
     series: 'worlds',
+    play: playAt('monster-workshop'),
   },
   {
     repo: 'Riftbound',
@@ -195,6 +217,7 @@ export const experiments: Experiment[] = [
     line: { en: 'One more night. Twelve outcasts, one spellbook.', fa: 'یک شب دیگر. دوازده رانده‌شده، یک کتاب جادو.' },
     glyph: 'rift',
     series: 'worlds',
+    play: playAt('riftbound'),
   },
   {
     repo: 'overload',
@@ -209,6 +232,7 @@ export const experiments: Experiment[] = [
     line: { en: 'A survival roguelite, solo or two-player couch co-op.', fa: 'روگ‌لایت بقا، تک‌نفره یا دونفره روی یک دستگاه.' },
     glyph: 'swarm',
     series: 'worlds',
+    play: playAt('wow-survivors'),
   },
   {
     repo: 'soulforge',
